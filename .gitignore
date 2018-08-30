@@ -71,3 +71,8 @@ typings/
 
 # Serverless directories
 .serverless
+
+# VScode files
+.vscode/
+
+connection-config.js
