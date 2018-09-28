@@ -15,6 +15,8 @@
     "morgan": "^1.9.0",
     "mssql": "^4.1.0",
     "node-fetch": "^2.2.0",
+    "sequelize": "^4.39.0",
+    "sqlite3": "^4.0.2",
     "xml2js": "^0.4.19",
     "xmlbuilder": "^10.0.0"
   },

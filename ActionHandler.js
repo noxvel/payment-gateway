@@ -1,7 +1,6 @@
-var Fault  = require('./errors.js');
-var Search = require('./actions/Search.js');
-var Check  = require('./actions/Check.js');
-var Pay    = require('./actions/Pay.js');
+const Search = require('./actions/Search.js');
+const Check  = require('./actions/Check.js');
+const Pay    = require('./actions/Pay.js');
 
 const {
   BadRequestError,

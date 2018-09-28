@@ -1,12 +1,12 @@
 const {
   InternalServerError
 } = require('../errors');
+const BillingDoc = require('../BillingDoc');
+const Database = require('../Database');
 
 class Pay {
 
   constructor() {
-    this._xml = '';
-
     this.actNumber = '';
     this.reference = '';
   }
@@ -21,7 +21,18 @@ class Pay {
   }
 
   async resolveAction(){
-    return ;
+
+    let db = new Database('Pay');
+    await db.connect();
+    await db.definePayment();
+
+    let pm = await db.wasPaid(this.reference);
+
+    let billDoc = new BillingDoc(pm.actID, pm.bonusID, pm.actSum, pm.paySum, pm.accrualAmount, pm.divisionID, pm.clientName, 'Pay');
+    await billDoc.create();
+
+    // to do
+    // set status in database, that docbill is created  ???
   }
 
   createResponse() {
@@ -41,13 +52,6 @@ class Pay {
 
   }
 
-  get xml(){
-    return this._xml;
-  }
-
-  set xml(value){
-    return; 
-  }
 }
 
 module.exports = Pay;

@@ -43,20 +43,14 @@ module.exports.BadRequestError = class extends BaseError {
     }
 }
 
+module.exports.NotFoundError = class extends BaseError {
+    constructor(action = '', msg = 'Информация не найдена') {
+        super(msg, 2, action);
+    }
+}
+
 module.exports.InternalServerError = class extends BaseError {
-    constructor(action = '') {
-        super('Внутренняя ошибка сервера', 99, action);
-    }
-}
-
-module.exports.NotFoundActError = class extends BaseError {
-    constructor(action = '') {
-        super('Номер акта не найден', 2, action);
-    }
-}
-
-module.exports.NotFoundBonuscardError = class extends BaseError {
-    constructor(action = '') {
-        super('Бонусная карта не найдена', 2, action);
+    constructor(action = '', msg = 'Внутренняя ошибка сервера') {
+        super(msg, 99, action);
     }
 }

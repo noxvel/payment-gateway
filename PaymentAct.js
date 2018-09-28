@@ -2,17 +2,17 @@ const sql = require('mssql');
 const { PAYMENT_ACT_SQL_CONFIG } = require('./connection-config');
 
 class PaymentAct {
-  constructor(actNumber) {
+  constructor(action, actNumber) {
+    this.action = action;
     this.actNumber = actNumber;
     this.divisionId = '';
     this.clientName = '';
-    this.paySum = 0; 
-    this.isError = false;
+    this.actSum = 0; 
   }
   
   _parseResult(result){
     for (let i of result){
-      this.paySum += i.SERVICE_FINAL_PRICE;
+      this.actSum += i.SERVICE_FINAL_PRICE;
     }
     this.clientName = result[0].PATIENT_NAME;
     this.divisionId = result[0].ID_PUNKTA_PRIEMA_ZAKAZA;
@@ -38,7 +38,7 @@ class PaymentAct {
       if (result.recordset.length > 0){
         that._parseResult(result.recordset);
       }else{
-        this.isError = true;
+        throw new NotFoundError('Search', 'Не найден номер акта');
       }
       sql.close();
 

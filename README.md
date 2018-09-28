@@ -6,13 +6,24 @@ This app is take a role of payment gateway for bank terminal and your billing sy
 ---
 
 ### Info
-Configuration for connection to bases, must be place in file connection-config.js, in format of export constants.
+Configuration for connection to bases and more, must be placed in file connection-config.js, in format of export constants.
 
-Exemple:
-`exports.PAYMENT_ACT_SQL_CONFIG = {
-  user: '',
-  password: '',
-  server: '',
-  database: '',
+Example:
+
+```javascript
+// SQL config for taking payment act data
+exports.PAYMENT_ACT_SQL_CONFIG = {
+  user: 'user',
+  password: 'password',
+  server: 'localhost',
+  database: 'myDatabase',
 };
-exports.BONUSCARD_API_PATH = '';`
+// API for bonuscard information
+exports.BONUSCARD_API_PATH = 'http://localhost/Bonuscard_API_Path';
+
+// API for create billing document
+exports.BILLING_DOCUMENT_API_PATH = 'http://localhost/BillingDoc_API_Path/';
+
+// Path for SQLite file
+exports.SQLITE_FILE_PATH = 'path/to/database.sqlite';
+```

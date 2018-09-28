@@ -1,19 +1,19 @@
-var express = require('express');
-var bodyParser = require('body-parser');
-var morgan = require('morgan');
-var ActionHandler = require('./ActionHandler.js')
+const express = require('express');
+const bodyParser = require('body-parser');
+const morgan = require('morgan');
+const ActionHandler = require('./ActionHandler.js')
 const {
   BaseError,
   BadRequestError
 } = require('./errors');
 
-var app = express();
+const app = express();
 app.use(morgan('combined'));
 
 // create application/json parser
-var jsonParser = bodyParser.json();
+const jsonParser = bodyParser.json();
 // parse an HTML body into a string
-var xmlParser = bodyParser.text({
+const xmlParser = bodyParser.text({
   type: ['text/html', 'text/xml']
 });
 
@@ -31,12 +31,6 @@ const asyncMiddleware = fn =>
     Promise.resolve(fn(req, res, next))
       .catch(next);
   };
-
-const setError = (handler, errorType) => {
-  handler.isError = true;
-  handler.setError(errorType);
-  handler.createResponse();
-}
 
 app.get('/', function (req, res) {
   res.sendStatus(400);
@@ -62,8 +56,6 @@ app.post('/privat', xmlParser, asyncMiddleware( async (req, res, next) => {
   res.send(handler.xml);
 
 }));
-
-
 
 app.use(function (err, req, res, next) {
   console.error(err)

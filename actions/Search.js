@@ -1,9 +1,7 @@
 var PaymentAct = require('../PaymentAct.js');
 var BonusCard = require('../BonusCard.js');
 const {
-  InternalServerError,
-  NotFoundActError,
-  NotFoundBonuscardError 
+  InternalServerError
 } = require('../errors');
 
 class Search {
@@ -11,8 +9,6 @@ class Search {
   constructor() {
     this.actSum = 0;
     this.bonusSum = 0;
-    this._xml = '';
-    
     this.actNumber = '';
     this.bonusNumber = ''; 
     this.useBonus = false;
@@ -31,26 +27,21 @@ class Search {
 
   async resolveAction() {
 
-    let payment = new PaymentAct(this.actNumber);
+    let payment = new PaymentAct('Search', this.actNumber);
     await payment.getPaymentData();
-    if (payment.isError) {
-      // return ERROR_TYPES.type_not_found_act;
-      throw new NotFoundActError('Search');
+
+    let bonus = new BonusCard('Search', this.bonusNumber, payment.actSum);
+    if (this.bonusNumber !== '') {
+      await bonus.getAllowedChargeBonusSum();
+    }
+    this.actSum = payment.actSum;
+    
+    if(this.useBonus == 'true'){
+      this.totalAmount = payment.actSum - bonus.discout;
+    }else{
+      this.totalAmount = payment.actSum;
     }
 
-    let bonus = new BonusCard(this.bonusNumber, payment.paySum);
-    if (this.bonusNumber !== '') {
-      await bonus.getBonusCardData();
-      if (bonus.isError) {
-        // return ERROR_TYPES.type_not_found_bonuscard;
-        throw new NotFoundBonuscardError('Search');
-      }
-    }
-    if(this.useBonus == 'true'){
-      this.totalAmount = payment.paySum - bonus.discout;
-    }else{
-      this.totalAmount = payment.paySum;
-    }
   }
 
   createResponse() {
@@ -93,13 +84,6 @@ class Search {
 
   }
 
-  get xml(){
-    return this._xml;
-  }
-
-  set xml(value){
-    return; 
-  }
 }
 
 module.exports = Search;
