@@ -1,17 +1,25 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const morgan = require('morgan');
-const ActionHandler = require('./ActionHandler.js')
+const fs = require('fs');
+const path = require('path');
+
+const {
+  LOGS_PATH
+} = require('./connection-config');
+const ActionHandler = require('./workers/ActionHandler')
 const {
   BaseError,
   BadRequestError
 } = require('./errors');
 
+const logger = require('./logger');
+
 const app = express();
-app.use(morgan('combined'));
+
+app.use(logger.express);
 
 // create application/json parser
-const jsonParser = bodyParser.json();
+// const jsonParser = bodyParser.json();
 // parse an HTML body into a string
 const xmlParser = bodyParser.text({
   type: ['text/html', 'text/xml']
@@ -36,13 +44,13 @@ app.get('/', function (req, res) {
   res.sendStatus(400);
 });
 
-app.post('/privat', xmlParser, asyncMiddleware( async (req, res, next) => {
+app.post('/privat', xmlParser, asyncMiddleware(async (req, res, next) => {
   let handler = new ActionHandler();
 
   if (!req.body) {
     throw new BadRequestError();
   }
-  
+
   handler.parseRequest(req.body);
 
   handler.createAction();
@@ -58,21 +66,22 @@ app.post('/privat', xmlParser, asyncMiddleware( async (req, res, next) => {
 }));
 
 app.use(function (err, req, res, next) {
-  console.error(err)
+  // console.error(err)
+  logger.error.error(err.message);
 
-  if (err instanceof BaseError){
+  if (err instanceof BaseError) {
     res.send(err.createResponse());
-  }else{
-    res.status(500).json({message: err.message});
-  } 
+  } else {
+    res.status(500).json({
+      message: err.message
+    });
+  }
 
   // res.status(500).json({
   //   message: 'an error occurred',
   //   err: err.message
   // })
-  
+
 })
 
-app.listen(3000, function () {
-  console.log('app is running, and it is very good!');
-})
+app.listen(4321, 'localhost');

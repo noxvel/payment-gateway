@@ -1,8 +1,8 @@
 const fetch = require('node-fetch');
-const { BILLING_DOCUMENT_API_PATH } = require('./connection-config');
+const { BILLING_DOCUMENT_API_PATH } = require('../connection-config');
 const {
   InternalServerError
-} = require('./errors');
+} = require('../errors');
 
 class BillingDoc {
 
@@ -32,17 +32,14 @@ class BillingDoc {
         if (response.ok) {
           return response.json();
         } else {
-          throw new InternalServerError(this.action);
+          throw new InternalServerError(this.action, 'Ошибка при запросе к платежной системе');
         }
       })
-      .then(json => {
-        console.log(json);
-        if (json.status === 0)
-          throw new InternalServerError(this.action, 'Не удалось создать документ оплаты');
-        
+      .then(status => {
+        if (status.code === 0)
+          throw new InternalServerError(this.action, status.msg);
       })
       .catch(err => {
-        console.log(err.message);
         throw new InternalServerError(this.action, err.message);
       })
 

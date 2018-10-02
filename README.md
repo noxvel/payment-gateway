@@ -26,4 +26,7 @@ exports.BILLING_DOCUMENT_API_PATH = 'http://localhost/BillingDoc_API_Path/';
 
 // Path for SQLite file
 exports.SQLITE_FILE_PATH = 'path/to/database.sqlite';
+
+// Path to app log files
+exports.LOGS_PATH = '/path/to/logs';
 ```

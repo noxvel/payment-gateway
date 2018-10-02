@@ -1,8 +1,10 @@
 const Sequelize = require('sequelize');
-const { SQLITE_FILE_PATH } = require('./connection-config');
+const {
+  SQLITE_FILE_PATH
+} = require('../connection-config');
 const {
   InternalServerError
-} = require('./errors');
+} = require('../errors');
 
 class Database {
 
@@ -21,11 +23,10 @@ class Database {
 
     this.connection
       .authenticate()
-      .then(function (err) {
-        console.log('Connection has been established successfully.');
+      .then(function () {
       }, function (err) {
-        console.log('Unable to connect to the database:', err);
-        throw err;
+        // console.log('Unable to connect to the database:', err);
+        throw new InternalServerError(this.action, 'Не удалось подключиться к базе данных');
       });
   }
 
@@ -35,22 +36,19 @@ class Database {
     this.payment = this.connection.define('Payment', {
       actID: Sequelize.STRING(20),
       bonusID: Sequelize.STRING(20),
-      actSum: Sequelize.FLOAT(15,2),
-      paySum: Sequelize.FLOAT(15,2),
-      accrualAmount: Sequelize.FLOAT(15,2),
+      actSum: Sequelize.FLOAT(15, 2),
+      paySum: Sequelize.FLOAT(15, 2),
+      accrualAmount: Sequelize.FLOAT(15, 2),
       divisionID: Sequelize.INTEGER(3),
       clientName: Sequelize.STRING(100),
-      statusPay: Sequelize.BOOLEAN,
-
-      // this field is under question
-      statusDoc: Sequelize.BOOLEAN
+      payStatus: Sequelize.BOOLEAN
     });
 
 
-    // // SYNC SCHEMA
+    // // SYNC(Create) SCHEMA
     // await this.connection
     //   .sync({
-    //     force: false
+    //     force: true 
     //   })
     //   .then(function () {
     //     console.log('It worked!');
@@ -71,38 +69,40 @@ class Database {
         accrualAmount: accrualAmount,
         divisionID: divisionID,
         clientName: clientName,
-        statusPay: false,
-        statusDoc: false
+        payStatus: false
       })
       .then(data => {
-        console.log(data);
         return data.id;
       })
       .catch(err => {
-        console.log('Error while write data in database');
-        throw new InternalServerError(this.action);
+        throw new InternalServerError(this.action, 'Ошибка записи платежа');
       })
   }
 
-  async wasPaid(referense) {
+  async findPayment(referense) {
 
     let pm = await this.payment.findById(referense)
-    console.log(pm);
     if (pm !== null) {
-      if (pm.statusPay) {
-        throw new InternalServerError(this.action, 'Платеж уже оплачен');
+      if (pm.payStatus) {
+        throw new InternalServerError(this.action, 'Платеж уже оплачен - ' + referense);
       }
-      // let updatedPM = await pm.update({
-      //   statusPay: true
-      // })
-      // return updatedPM;
       return pm;
     } else {
-      throw new InternalServerError(this.action, 'Код reference не найден');
+      throw new InternalServerError(this.action, 'Код reference не найден - ' + referense);
     }
   }
 
-}
+  async setPayStatus(pm, reference) {
 
+    if (pm !== undefined) {
+      if (pm.payStatus) {
+        throw new InternalServerError(this.action, 'Платеж уже оплачен - ' + reference);
+      }
+      await pm.update({ payStatus: true })
+    } else {
+      throw new InternalServerError(this.action, 'Отсутствует запись для обновления статуса оплаты');
+    }
+  }
+}
 
 module.exports = Database;

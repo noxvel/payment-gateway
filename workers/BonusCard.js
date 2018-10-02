@@ -1,10 +1,10 @@
 const fetch = require('node-fetch');
-const { BONUSCARD_API_PATH } = require('./connection-config');
+const { BONUSCARD_API_PATH } = require('../connection-config');
 
 const {
   InternalServerError,
   NotFoundError
-} = require('./errors');
+} = require('../errors');
 
 class BonusCard {
   
@@ -28,15 +28,13 @@ class BonusCard {
       }
     })
     .then(json => {
-      console.log(json);
       if (json.statusCode === 0){
-        throw new NotFoundError('Search', 'Не найден номер бонусной карты');
+        throw new NotFoundError('Search', 'Не найден номер бонусной карты - ' + this.cardNumber);
       }else{
         that.discout = json.cardBalance;
       }
     }) 
     .catch(err => {
-      console.log(err.message);
       throw err;
     })
 
@@ -53,19 +51,16 @@ class BonusCard {
       }
     })
     .then(json => {
-      console.log(json);
       if (json.statusCode === 0){
-        throw new NotFoundError('Search', 'Не найден номер бонусной карты');
+        throw new NotFoundError('Search', 'Не найден номер бонусной карты - ' + this.cardNumber);
       }else{
         that.accrualAmount = json.accrualAmount;
       }
     }) 
     .catch(err => {
-      console.log(err.message);
       throw err;
     })
   }
-
 
 }
 

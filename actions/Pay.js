@@ -1,8 +1,8 @@
 const {
   InternalServerError
 } = require('../errors');
-const BillingDoc = require('../BillingDoc');
-const Database = require('../Database');
+const BillingDoc = require('../workers/BillingDoc');
+const Database = require('../workers/Database');
 
 class Pay {
 
@@ -14,7 +14,7 @@ class Pay {
   getRequestValues(result){
     try {
       this.actNumber = result.Transfer.Data[0].PayerInfo[0].$.billIdentifier;
-      this.reference = result.Transfer.Data[0].CompanyInfo[0].CheckReference[0];
+      this.reference = parseInt(result.Transfer.Data[0].CompanyInfo[0].CheckReference[0]);
     } catch (error) {
       throw new InternalServerError();
     }
@@ -26,13 +26,12 @@ class Pay {
     await db.connect();
     await db.definePayment();
 
-    let pm = await db.wasPaid(this.reference);
+    let pm = await db.findPayment(this.reference);
 
     let billDoc = new BillingDoc(pm.actID, pm.bonusID, pm.actSum, pm.paySum, pm.accrualAmount, pm.divisionID, pm.clientName, 'Pay');
     await billDoc.create();
 
-    // to do
-    // set status in database, that docbill is created  ???
+    await db.setPayStatus(pm, this.reference);
   }
 
   createResponse() {

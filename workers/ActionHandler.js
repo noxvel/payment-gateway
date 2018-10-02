@@ -1,11 +1,10 @@
-const Search = require('./actions/Search.js');
-const Check  = require('./actions/Check.js');
-const Pay    = require('./actions/Pay.js');
+const Search = require('../actions/Search.js');
+const Check  = require('../actions/Check.js');
+const Pay    = require('../actions/Pay.js');
 
 const {
   BadRequestError,
-  InternalServerError 
-} = require('./errors');
+} = require('../errors');
 
 class ActionHandler {
   
@@ -14,7 +13,6 @@ class ActionHandler {
     this._xml = '';
     this.result = {};
     this.reference = '';
-    this.isError = false;
   }
   
   parseRequest(xml) {
@@ -23,11 +21,8 @@ class ActionHandler {
     parseString(xml, {
       trim: true
     }, (err, result) => {
-      //console.dir(result);
       if (err) {
-        console.log(err.message);
-        this.isError = true;
-        throw new BadRequestError();
+        throw new BadRequestError('Не удалось распарсить тело запроса');
       }
       this._getAction(result);
       this.result = result;
@@ -46,8 +41,7 @@ class ActionHandler {
         this.actionObj = new Pay();
         break;
       default:
-        this.isError = true;
-        throw new BadRequestError();
+        throw new BadRequestError('Неизвестное название действия - ' + this.action);
     }
   }
 
@@ -67,9 +61,7 @@ class ActionHandler {
     try {
       this.action = xml.Transfer.$.action;
     } catch (err) {
-      console.log(err.message);
-      this.isError = true;
-      throw new BadRequestError();
+      throw new BadRequestError('Не удалось получить имя действия');
     }
   }
 

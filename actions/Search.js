@@ -1,5 +1,5 @@
-var PaymentAct = require('../PaymentAct.js');
-var BonusCard = require('../BonusCard.js');
+var PaymentAct = require('../workers/PaymentAct.js');
+var BonusCard = require('../workers/BonusCard.js');
 const {
   InternalServerError
 } = require('../errors');
@@ -24,6 +24,7 @@ class Search {
       throw new InternalServerError();
     }
   }
+
 
   async resolveAction() {
 

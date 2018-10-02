@@ -1,5 +1,9 @@
 const sql = require('mssql');
-const { PAYMENT_ACT_SQL_CONFIG } = require('./connection-config');
+const { PAYMENT_ACT_SQL_CONFIG } = require('../connection-config');
+const {
+  InternalServerError,
+  NotFoundError
+} = require('../errors');
 
 class PaymentAct {
   constructor(action, actNumber) {
@@ -24,7 +28,7 @@ class PaymentAct {
     
     sql.on('error', err => {
       // ... error handler
-      throw Error('Ошибка при получения данных по номеру акта');
+      throw new InternalServerError(this.action, 'Ошибка при получения данных по номеру акта - ' + that.actNumber);
     })
 
     return sql.connect(PAYMENT_ACT_SQL_CONFIG).then(pool => {
@@ -34,11 +38,10 @@ class PaymentAct {
         //.input('input_parameter', sql.Int, value)
         .query(`exec spReport1cGetBookingByActNumberWithoutPlnStatus @FilterXML='<Filter><ActCode>${that.actNumber}</ActCode></Filter>', @Login='1c', @DoApply=1, @UseForReport = 0`)
     }).then(result => {
-      console.dir(result.recordset)
       if (result.recordset.length > 0){
         that._parseResult(result.recordset);
       }else{
-        throw new NotFoundError('Search', 'Не найден номер акта');
+        throw new NotFoundError(this.action, 'Не найден номер акта - ' + that.actNumber);
       }
       sql.close();
 
@@ -49,10 +52,9 @@ class PaymentAct {
       //   .output('output_parameter', sql.VarChar(50))
       //   .execute('procedure_name')
     }).catch(err => {
-      console.log(err.message);
       sql.close();
       // ... error checks
-      throw Error('Ошибка при получения данных по номеру акта');
+      throw new InternalServerError(this.action, 'Ошибка при получения данных по номеру акта - ' + that.actNumber);
     })
 
     //sql.close();

@@ -1,6 +1,6 @@
-const PaymentAct = require('../PaymentAct.js');
-const BonusCard = require('../BonusCard.js');
-const Database = require('../Database.js');
+const PaymentAct = require('../workers/PaymentAct.js');
+const BonusCard = require('../workers/BonusCard.js');
+const Database = require('../workers/Database.js');
 
 const {
   InternalServerError

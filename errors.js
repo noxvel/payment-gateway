@@ -38,8 +38,8 @@ class BaseError extends Error {
 module.exports.BaseError = BaseError;
 
 module.exports.BadRequestError = class extends BaseError {
-    constructor(action = '') {
-        super('Неизвестный тип запроса', 1, action);
+    constructor(msg = 'Неизвестный тип запроса', action = '') {
+        super(msg, 1, action);
     }
 }
 
