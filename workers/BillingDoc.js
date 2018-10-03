@@ -40,7 +40,7 @@ class BillingDoc {
           throw new InternalServerError(this.action, status.msg);
       })
       .catch(err => {
-        throw new InternalServerError(this.action, err.message);
+        throw err;
       })
 
   }
