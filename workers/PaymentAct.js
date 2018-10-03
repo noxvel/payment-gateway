@@ -1,5 +1,5 @@
 const sql = require('mssql');
-const { PAYMENT_ACT_SQL_CONFIG } = require('../connection-config');
+const { PAYMENT_ACT_SQL_CONFIG, PAYMENT_ACT_PROCEDURE_NAME } = require('../connection-config');
 const {
   InternalServerError,
   NotFoundError
@@ -36,7 +36,7 @@ class PaymentAct {
 
       return pool.request()
         //.input('input_parameter', sql.Int, value)
-        .query(`exec spReport1cGetBookingByActNumberWithoutPlnStatus @FilterXML='<Filter><ActCode>${that.actNumber}</ActCode></Filter>', @Login='1c', @DoApply=1, @UseForReport = 0`)
+        .query(`exec ${PAYMENT_ACT_PROCEDURE_NAME} @FilterXML='<Filter><ActCode>${that.actNumber}</ActCode></Filter>', @Login='1c', @DoApply=1, @UseForReport = 0`)
     }).then(result => {
       if (result.recordset.length > 0){
         that._parseResult(result.recordset);

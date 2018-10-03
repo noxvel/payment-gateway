@@ -29,4 +29,7 @@ exports.SQLITE_FILE_PATH = 'path/to/database.sqlite';
 
 // Path to app log files
 exports.LOGS_PATH = '/path/to/logs';
+
+// SQL procedure name for payment act
+exports.PAYMENT_ACT_PROCEDURE_NAME = 'ProcedureName';
 ```
