@@ -1,7 +1,7 @@
 {
   "name": "payment-gateway",
-  "version": "0.2.1",
-  "description": "",
+  "version": "0.3.0",
+  "description": "App for connect bank and billing system",
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",

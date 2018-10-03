@@ -1,15 +1,17 @@
 const fetch = require('node-fetch');
-const { BILLING_DOCUMENT_API_PATH } = require('../connection-config');
+const { BILLING_DOCUMENT_API_PATH, BANK_NAME } = require('../connection-config');
 const {
   InternalServerError
 } = require('../errors');
 
 class BillingDoc {
 
-  constructor(actNumber, bonusNumber, actSum, paySum, accrualAmount, divisionId, clientName, action = '') {
+  constructor(reference, actNumber, bonusNumber, actSum, paySum, accrualAmount, divisionId, clientName, action = '') {
     this.action = action;
 
-    this.docData = { 
+    this.docData = {
+      bankName: BANK_NAME,
+      reference: reference, 
       actNumber: actNumber,
       bonusNumber: bonusNumber,
       paySum: paySum,

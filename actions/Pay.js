@@ -28,7 +28,7 @@ class Pay {
 
     let pm = await db.findPayment(this.reference);
 
-    let billDoc = new BillingDoc(pm.actID, pm.bonusID, pm.actSum, pm.paySum, pm.accrualAmount, pm.divisionID, pm.clientName, 'Pay');
+    let billDoc = new BillingDoc(pm.id, pm.actID, pm.bonusID, pm.actSum, pm.paySum, pm.accrualAmount, pm.divisionID, pm.clientName, 'Pay');
     await billDoc.create();
 
     await db.setPayStatus(pm, this.reference);
