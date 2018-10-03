@@ -34,7 +34,7 @@ class PaymentAct {
 
       return pool.request()
         //.input('input_parameter', sql.Int, value)
-        .query(`exec ${PAYMENT_ACT_PROCEDURE_NAME} @FilterXML='<Filter><ActCode>${that.actNumber}</ActCode></Filter>', @Login='1c', @DoApply=1, @UseForReport = 0`)
+        .query(`exec ${PAYMENT_ACT_PROCEDURE_NAME} @FilterXML='<Filter><ActCode>${parseInt(that.actNumber)}</ActCode></Filter>', @Login='1c', @DoApply=1, @UseForReport = 0`)
         }).then(result => {
           if (result.recordset.length > 0) {
             that._parseResult(result.recordset);
