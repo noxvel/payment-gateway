@@ -55,7 +55,7 @@ class Search {
       .ele('Data', {'xmlns:xsi':'http://www.w3.org/2001/XMLSchema-instance', 'xsi:type':'DebtPack'})
         .ele('Message', {}, 'Данные о задолженности можно получить в Кассе!')
         .up()
-        .ele('PayerInfo', {'billIdentifier': this.actNumber, 'ls': this.bonusNumber})
+        .ele('PayerInfo', {'billIdentifier': this.actNumber})
         .up()
         .ele('ServiceGroup')
           .ele('DebtService',{'serviceCode':'101'})
@@ -75,7 +75,7 @@ class Search {
             .up()
             .ele('Destination',{},'Оплата за предоставленные медицинские услуги')
             .up()
-            .ele('PayerInfo',{'billIdentifier': this.actNumber})
+            .ele('PayerInfo',{'billIdentifier': this.actNumber, 'ls': this.bonusNumber})
       .end({
         pretty: true
       });
