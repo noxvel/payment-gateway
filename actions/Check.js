@@ -21,7 +21,7 @@ class Check {
       this.bonusNumber = result.Transfer.Data[0].PayerInfo[0].$.ls;
       this.totalSum = parseFloat(result.Transfer.Data[0].TotalSum[0]);
     } catch (error) {
-      throw new InternalServerError();
+      throw new InternalServerError('Check','Не удалось получить значение праметра из запроса - ' + error.message);
     }
   }
 

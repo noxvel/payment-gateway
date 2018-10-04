@@ -21,10 +21,9 @@ class Search {
       this.bonusNumber = result.Transfer.Data[0].Unit[1].$.value;
       this.useBonus    = result.Transfer.Data[0].Unit[2].$.value;
     } catch (error) {
-      throw new InternalServerError();
+      throw new InternalServerError('Search','Не удалось получить значение праметра из запроса - ' + error.message);
     }
   }
-
 
   async resolveAction() {
 
@@ -36,7 +35,8 @@ class Search {
       await bonus.getAllowedChargeBonusSum();
     }
     this.actSum = payment.actSum;
-    
+    this.bonusSum = bonus.discout;
+
     if(this.useBonus == 'true'){
       this.totalAmount = payment.actSum - bonus.discout;
     }else{
@@ -53,7 +53,7 @@ class Search {
       .att('interface','Debt')
       .att('action','Search')
       .ele('Data', {'xmlns:xsi':'http://www.w3.org/2001/XMLSchema-instance', 'xsi:type':'DebtPack'})
-        .ele('Message', {}, 'Данные о задолженности можно получить в Кассе!')
+        .ele('Message', {}, `Сумма по акту - ${this.actSum}, сумма списания бонусов - ${this.bonusSum}` )
         .up()
         .ele('PayerInfo', {'billIdentifier': this.actNumber})
         .up()

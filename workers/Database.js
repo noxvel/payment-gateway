@@ -41,7 +41,8 @@ class Database {
       accrualAmount: Sequelize.FLOAT(15, 2),
       divisionID: Sequelize.INTEGER(3),
       clientName: Sequelize.STRING(100),
-      payStatus: Sequelize.BOOLEAN
+      payStatus: Sequelize.BOOLEAN,
+      isCanceled: Sequelize.BOOLEAN
     });
 
 
@@ -69,7 +70,8 @@ class Database {
         accrualAmount: accrualAmount,
         divisionID: divisionID,
         clientName: clientName,
-        payStatus: false
+        payStatus: false,
+        isCanceled: false
       })
       .then(data => {
         return data.id;

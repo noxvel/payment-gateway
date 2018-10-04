@@ -1,6 +1,6 @@
 {
   "name": "payment-gateway",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "App for connect bank and billing system",
   "main": "app.js",
   "scripts": {

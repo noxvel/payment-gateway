@@ -9,14 +9,16 @@ class Pay {
   constructor() {
     this.actNumber = '';
     this.reference = '';
+    this.totalSum
   }
 
   getRequestValues(result){
     try {
       this.actNumber = result.Transfer.Data[0].PayerInfo[0].$.billIdentifier;
       this.reference = parseInt(result.Transfer.Data[0].CompanyInfo[0].CheckReference[0]);
+      this.totalSum = parseFloat(result.Transfer.Data[0].TotalSum[0]);
     } catch (error) {
-      throw new InternalServerError();
+      throw new InternalServerError('Pay','Не удалось получить значение праметра из запроса - ' + error.message);
     }
   }
 
@@ -27,6 +29,10 @@ class Pay {
     await db.definePayment();
 
     let pm = await db.findPayment(this.reference);
+
+    if (pm.paySum !== this.totalSum){
+      throw new InternalServerError('Pay', 'Сумма оплаты из запроса не равна сумме подтвержденной оплаты');
+    }
 
     let billDoc = new BillingDoc(pm.id, pm.actID, pm.bonusID, pm.actSum, pm.paySum, pm.accrualAmount, pm.divisionID, pm.clientName, 'Pay');
     await billDoc.create();
