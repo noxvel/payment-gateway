@@ -27,6 +27,14 @@ class PaymentAct {
 
   getPaymentData() {
 
+    // Test actNumber for Bank testing operations
+    if (this.actNumber == '99999999') {
+      this.actSum = 9999;
+      this.clientName = 'Чапаев Иван Васильевич';
+      this.divisionId = 211;
+      return;
+    }
+
     let that = this;
 
     return sql.connect(PAYMENT_ACT_SQL_CONFIG).then(pool => {
