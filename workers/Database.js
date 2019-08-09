@@ -47,17 +47,17 @@ class Database {
     });
 
 
-    // // SYNC(Create) SCHEMA
-    // await this.connection
-    //   .sync({
-    //     force: true 
-    //   })
-    //   .then(function () {
-    //     console.log('It worked!');
-    //   }, function (err) {
-    //     console.log('An error occurred while creating the table:', err);
-    //     throw err;
-    //   });
+     // SYNC(Create) SCHEMA
+     //await this.connection
+     //  .sync({
+     //    force: true 
+     //  })
+     //  .then(function () {
+     //    console.log('It worked!');
+     //  }, function (err) {
+     //    console.log('An error occurred while creating the table:', err);
+     //    throw err;
+     //  });
 
   }
 
@@ -78,7 +78,7 @@ class Database {
         return data.id;
       })
       .catch(err => {
-        throw new InternalServerError(this.action, 'Ошибка записи платежа');
+        throw new InternalServerError(this.action, 'Ошибка записи платежа: ' + err.message);
       })
   }
 

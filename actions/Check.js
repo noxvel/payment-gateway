@@ -14,8 +14,8 @@ class Check extends BaseAction{
   }
 
   _getRequestValuesJSON(result) {
-    this.actNumber = result.bill_identifier;
-    this.bonusNumber = result.ls;
+    this.actNumber = result.actNumber;
+    this.bonusNumber = result.bonusNumber;
     this.totalSum = result.totalSum;
   }
 

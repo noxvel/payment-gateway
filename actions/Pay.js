@@ -9,19 +9,17 @@ class Pay extends BaseAction{
 
   constructor() {
     super("Pay");
-    this.actNumber = '';
     this.reference = '';
     this.totalSum = 0;
   }
 
   _getRequestValuesJSON(result) {
-    this.actNumber = result.bill_identifier;
     this.reference = result.reference;
     this.totalSum = result.totalSum;
   }
 
   _getRequestValuesXML(result) {
-    this.actNumber = result.Transfer.Data[0].PayerInfo[0].$.billIdentifier;
+    //this.actNumber = result.Transfer.Data[0].PayerInfo[0].$.billIdentifier;
     this.reference = parseInt(result.Transfer.Data[0].CompanyInfo[0].CheckReference[0]);
     this.totalSum = parseFloat(result.Transfer.Data[0].TotalSum[0]);
   }

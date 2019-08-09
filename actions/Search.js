@@ -12,8 +12,8 @@ class Search extends BaseAction{
   }
 
   _getRequestValuesJSON(result) {
-    this.actNumber = result.bill_identifier;
-    this.bonusNumber = result.ls;
+    this.actNumber = result.actNumber;
+    this.bonusNumber = result.bonusNumber;
   }
 
   _getRequestValuesXML(result) {
