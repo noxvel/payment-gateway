@@ -18,7 +18,8 @@ class Database {
     this.connection = new Sequelize('payments', null, null, {
       dialect: 'sqlite',
       // SQLite only
-      storage: SQLITE_FILE_PATH
+      storage: SQLITE_FILE_PATH,
+      operatorsAliases: false
     });
 
     this.connection

@@ -7,10 +7,25 @@ class BaseError extends Error {
     this.name = this.constructor.name;
     this.action = action;
     this.code = code;
-    this._xml = '';
   }
 
-  createResponse() {
+  createResponse(reqType) {
+    if (reqType === 'json') {
+      return this._createResponseJSON();
+    } else if (reqType === 'xml') {
+      return this._createResponseXML();
+    }
+  }
+  _createResponseJSON() {
+    let resBody = {
+      action: this.action,
+      code: this.code,
+      message: this.message
+    }
+    return JSON.stringify(resBody);
+  }
+
+  _createResponseXML() {
     let builder = require('xmlbuilder');
     let xml = builder.create('Transfer', {version: '1.0', encoding: 'UTF-8', standalone: true})
       .att('xmlns','http://debt.privatbank.ua/Transfer')
@@ -26,13 +41,6 @@ class BaseError extends Error {
     return xml.toString();
   }
 
-  get xml(){
-    return this._xml;
-  }
-
-  set xml(value){
-    return; 
-  }
 }
 
 module.exports.BaseError = BaseError;

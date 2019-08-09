@@ -3,23 +3,27 @@ const {
 } = require('../errors');
 const BillingDoc = require('../workers/BillingDoc');
 const Database = require('../workers/Database');
+const BaseAction = require('./BaseAction.js');
 
-class Pay {
+class Pay extends BaseAction{
 
   constructor() {
+    super("Pay");
     this.actNumber = '';
     this.reference = '';
-    this.totalSum
+    this.totalSum = 0;
   }
 
-  getRequestValues(result){
-    try {
-      this.actNumber = result.Transfer.Data[0].PayerInfo[0].$.billIdentifier;
-      this.reference = parseInt(result.Transfer.Data[0].CompanyInfo[0].CheckReference[0]);
-      this.totalSum = parseFloat(result.Transfer.Data[0].TotalSum[0]);
-    } catch (error) {
-      throw new InternalServerError('Pay','Не удалось получить значение праметра из запроса - ' + error.message);
-    }
+  _getRequestValuesJSON(result) {
+    this.actNumber = result.bill_identifier;
+    this.reference = result.reference;
+    this.totalSum = result.totalSum;
+  }
+
+  _getRequestValuesXML(result) {
+    this.actNumber = result.Transfer.Data[0].PayerInfo[0].$.billIdentifier;
+    this.reference = parseInt(result.Transfer.Data[0].CompanyInfo[0].CheckReference[0]);
+    this.totalSum = parseFloat(result.Transfer.Data[0].TotalSum[0]);
   }
 
   async resolveAction(){
@@ -40,8 +44,15 @@ class Pay {
     await db.setPayStatus(pm, this.reference);
   }
 
-  createResponse() {
+  _createResponseJSON() {
+    let resBody = {
+      action: "Pay",
+      reference: this.reference
+    }
+    return JSON.stringify(resBody);
+  }
 
+  _createResponseXML() {
     let builder = require('xmlbuilder');
     let xml = builder.create('Transfer', {version: '1.0', encoding: 'UTF-8', standalone: true})
       .att('xmlns','http://debt.privatbank.ua/Transfer')
@@ -54,7 +65,6 @@ class Pay {
 
     // this._xml = xml.toString();
     return xml.toString();
-
   }
 
 }

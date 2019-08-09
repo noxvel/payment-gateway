@@ -1,11 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const fs = require('fs');
-const path = require('path');
 
-const {
-  LOGS_PATH
-} = require('./connection-config');
 const ActionHandler = require('./workers/ActionHandler')
 const {
   BaseError,
@@ -19,12 +14,14 @@ const app = express();
 app.use(logger.express);
 
 // create application/json parser
-// const jsonParser = bodyParser.json();
+const jsonParser = bodyParser.json();
 // parse an HTML body into a string
 const xmlParser = bodyParser.text({
   type: ['text/html', 'text/xml']
 });
 
+app.use(jsonParser)
+app.use(xmlParser)
 // //CORS Middleware
 // app.use(function (req, res, next) {
 //   //Enabling CORS 
@@ -44,8 +41,20 @@ app.get('/', function (req, res) {
   res.sendStatus(400);
 });
 
-app.post('/privat', xmlParser, asyncMiddleware(async (req, res, next) => {
-  let handler = new ActionHandler();
+
+app.post('/privat', asyncMiddleware(async (req, res, next) => {
+
+  let handler;
+
+  if (req.is('json')) {
+    handler = new ActionHandler('json');
+    res.type('json');
+  } else if (req.is('text/xml')) {
+    handler = new ActionHandler('xml');
+    res.type('text/xml');
+  } else {
+    throw new BadRequestError();
+  }
 
   if (!req.body) {
     throw new BadRequestError();
@@ -61,7 +70,7 @@ app.post('/privat', xmlParser, asyncMiddleware(async (req, res, next) => {
 
   handler.createResponse();
 
-  res.send(handler.xml);
+  res.send(handler.resBody);
 
 }));
 
@@ -70,7 +79,17 @@ app.use(function (err, req, res, next) {
   logger.error.error(err.message);
 
   if (err instanceof BaseError) {
-    res.send(err.createResponse());
+    if (req.is('json')) {
+      res.type('json');
+      res.send(err.createResponse('json'));
+    } else if (req.is('text/xml')) {
+      res.type('text/xml');
+      res.send(err.createResponse('xml'));
+    } else {
+      res.status(500).json({
+        message: "Wrong Content-Type header in request, use JSON or XML type to see error message"
+      });
+    }
   } else {
     res.status(500).json({
       message: err.message

@@ -1,28 +1,28 @@
 const PaymentAct = require('../workers/PaymentAct.js');
 const BonusCard = require('../workers/BonusCard.js');
 const Database = require('../workers/Database.js');
+const BaseAction = require('./BaseAction.js');
 
-const {
-  InternalServerError
-} = require('../errors');
-
-class Check {
+class Check extends BaseAction{
 
   constructor() {
+    super("Check");
     this.reference = '';
     this.actNumber = '';
     this.bonusNumber = '';
     this.totalSum = 0;
   }
 
-  getRequestValues(result) {
-    try {
-      this.actNumber = result.Transfer.Data[0].PayerInfo[0].$.billIdentifier;
-      this.bonusNumber = result.Transfer.Data[0].PayerInfo[0].$.ls;
-      this.totalSum = parseFloat(result.Transfer.Data[0].TotalSum[0]);
-    } catch (error) {
-      throw new InternalServerError('Check','Не удалось получить значение праметра из запроса - ' + error.message);
-    }
+  _getRequestValuesJSON(result) {
+    this.actNumber = result.bill_identifier;
+    this.bonusNumber = result.ls;
+    this.totalSum = result.totalSum;
+  }
+
+  _getRequestValuesXML(result) {
+    this.actNumber = result.Transfer.Data[0].PayerInfo[0].$.billIdentifier;
+    this.bonusNumber = result.Transfer.Data[0].PayerInfo[0].$.ls;
+    this.totalSum = parseFloat(result.Transfer.Data[0].TotalSum[0]);
   }
 
   async resolveAction() {
@@ -42,14 +42,22 @@ class Check {
 
   }
 
-  createResponse() {
+  _createResponseJSON() {
+    let resBody = {
+      action: "Check",
+      reference: this.reference
+    }
+    return JSON.stringify(resBody);
+  }
+
+  _createResponseXML() {
 
     let builder = require('xmlbuilder');
     let xml = builder.create('Transfer', {
-        version: '1.0',
-        encoding: 'UTF-8',
-        standalone: true
-      })
+      version: '1.0',
+      encoding: 'UTF-8',
+      standalone: true
+    })
       .att('xmlns', 'http://debt.privatbank.ua/Transfer')
       .att('interface', 'Debt')
       .att('action', 'Check')

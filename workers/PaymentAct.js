@@ -1,7 +1,9 @@
 const sql = require('mssql');
+const fetch = require('node-fetch');
 const {
   PAYMENT_ACT_SQL_CONFIG,
-  PAYMENT_ACT_PROCEDURE_NAME
+  PAYMENT_ACT_PROCEDURE_NAME,
+  PAYMENT_ACT_API_PATH
 } = require('../connection-config');
 const {
   InternalServerError,
@@ -17,15 +19,7 @@ class PaymentAct {
     this.actSum = 0;
   }
 
-  _parseResult(result) {
-    for (let i of result) {
-      this.actSum += i.SERVICE_FINAL_PRICE;
-    }
-    this.clientName = result[0].PATIENT_NAME;
-    this.divisionId = result[0].ID_PUNKTA_PRIEMA_ZAKAZA;
-  }
-
-  getPaymentData() {
+  async getPaymentData(){
 
     // Test actNumber for Bank testing operations
     if (this.actNumber == '99999999') {
@@ -34,6 +28,49 @@ class PaymentAct {
       this.divisionId = 211;
       return;
     }
+
+    // await this.getPaymentDataAPI();
+    await this.getPaymentDataSQL();
+  }
+
+  _parseResult(result,isSql = false) {
+
+    if (isSql){
+      result.forEach(i => {
+        this.actSum += i.SERVICE_FINAL_PRICE;
+      })
+    }else{
+      this.actSum     = result[0].K_OPLATE;
+    }
+
+    this.clientName = result[0].PATIENT_NAME;
+    this.divisionId = result[0].ID_PUNKTA_PRIEMA_ZAKAZA;
+  }
+
+  getPaymentDataAPI() {
+
+    return fetch(PAYMENT_ACT_API_PATH + this.actNumber)
+    .then(response => {
+      if (response.ok) {
+        return response.json();
+      } else {
+        throw new InternalServerError(this.action, 'Не удалось получить данные по номеру акта.');
+      }
+    })
+    .then(json => {
+      if (json.Act.length == 0){
+        throw new NotFoundError(this.action, 'Не найден номер акта - ' + this.actNumber);
+      }else{
+        this._parseResult(json.Act);
+      }
+    }) 
+    .catch(err => {
+      throw err;
+    })
+
+  }
+
+  getPaymentDataSQL() {
 
     let that = this;
 
@@ -45,7 +82,7 @@ class PaymentAct {
         .query(`exec ${PAYMENT_ACT_PROCEDURE_NAME} @FilterXML='<Filter><ActCode>${parseInt(that.actNumber)}</ActCode></Filter>', @Login='1c', @DoApply=1, @UseForReport = 0`)
         }).then(result => {
           if (result.recordset.length > 0) {
-            that._parseResult(result.recordset);
+            that._parseResult(result.recordset, true);
           } else {
             throw new NotFoundError(this.action, 'Не найден номер акта - ' + that.actNumber);
           }

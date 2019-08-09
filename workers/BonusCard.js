@@ -16,6 +16,28 @@ class BonusCard {
     this.accrualAmount = 0;
   }
 
+  findCard(){
+
+    return fetch(BONUSCARD_API_PATH + 'findcard/' + this.cardNumber)
+    .then(response => {
+      if (response.ok) {
+        return response.json();
+      } else {
+        throw new InternalServerError();
+      }
+    })
+    .then(json => {
+      if (json.statusCode === 0){
+        throw new NotFoundError('Search', 'Не найдена бонусная карта - ' + this.cardNumber);
+      }
+    }) 
+    .catch(err => {
+      throw err;
+    })
+
+  }
+
+
   getAllowedChargeBonusSum() {
 
     let that = this;

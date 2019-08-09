@@ -1,30 +1,54 @@
 const Search = require('../actions/Search.js');
-const Check  = require('../actions/Check.js');
-const Pay    = require('../actions/Pay.js');
+const Check = require('../actions/Check.js');
+const Pay = require('../actions/Pay.js');
 
 const {
   BadRequestError,
 } = require('../errors');
 
 class ActionHandler {
-  
-  constructor() {
+
+  constructor(reqType) {
+    this.reqType = reqType;
     this.action = '';
-    this._xml = '';
+    this.resBody = '';
     this.result = {};
     this.reference = '';
   }
-  
-  parseRequest(xml) {
+
+  parseRequest(body) {
+
+    if (this.reqType === 'json') {
+      this._parseRequestJSON(body);
+    } else if (this.reqType === 'xml') {
+      this._parseRequestXML(body);
+    }
+
+  }
+
+  _parseRequestJSON(body) {
+    try {
+      this.action = body.action;
+    } catch (err) {
+      throw new BadRequestError('Не удалось получить имя действия');
+    }
+    this.result = body;
+  }
+
+  _parseRequestXML(body) {
     let parseString = require('xml2js').parseString;
-    
-    parseString(xml, {
+
+    parseString(body, {
       trim: true
     }, (err, result) => {
       if (err) {
         throw new BadRequestError('Не удалось распарсить тело запроса');
       }
-      this._getAction(result);
+      try {
+        this.action = result.Transfer.$.action;
+      } catch (err) {
+        throw new BadRequestError('Не удалось получить имя действия');
+      }
       this.result = result;
     });
   }
@@ -45,33 +69,18 @@ class ActionHandler {
     }
   }
 
-  getRequestValues(){
-    this.actionObj.getRequestValues(this.result);
+  getRequestValues() {
+    this.actionObj.getRequestValues(this.reqType,this.result);
   }
-  
-  async resolveAction(){
+
+  async resolveAction() {
     await this.actionObj.resolveAction();
   }
 
   createResponse() {
-    this._xml = this.actionObj.createResponse();
-  };
-
-  _getAction(xml) {
-    try {
-      this.action = xml.Transfer.$.action;
-    } catch (err) {
-      throw new BadRequestError('Не удалось получить имя действия');
-    }
+    this.resBody = this.actionObj.createResponse(this.reqType);
   }
-
-  get xml() {
-    return this._xml;
-  }
-
-  set xml(value) {
-    return;
-  }
+  
 }
 
 module.exports = ActionHandler;
