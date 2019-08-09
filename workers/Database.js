@@ -27,7 +27,7 @@ class Database {
       .then(function () {
       }, function (err) {
         // console.log('Unable to connect to the database:', err);
-        throw new InternalServerError(this.action, 'Не удалось подключиться к базе данных');
+        throw new InternalServerError(this.action, 'Не удалось подключиться к базе данных: ' + err.message);
       });
   }
 
