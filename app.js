@@ -38,7 +38,8 @@ const asyncMiddleware = fn =>
   };
 
 app.get('/', function (req, res) {
-  res.sendStatus(400);
+  //res.sendStatus(400);
+	res.send('Connection is working fine');
 });
 
 
