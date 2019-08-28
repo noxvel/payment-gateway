@@ -28,7 +28,7 @@ class BonusCard {
     })
     .then(json => {
       if (json.statusCode === 0){
-        throw new NotFoundError(this.action, 'Не найдена бонусная карта - ' + this.cardNumber);
+        throw new NotFoundError(this.action, 'Не вдалося знайти номер бонусної картки - ' + this.cardNumber);
       }
     }) 
     .catch(err => {
@@ -51,7 +51,7 @@ class BonusCard {
     })
     .then(json => {
       if (json.statusCode === 0){
-        throw new NotFoundError(this.action, 'Не найден номер бонусной карты - ' + this.cardNumber);
+        throw new NotFoundError(this.action, 'Не вдалося знайти номер бонусної картки - ' + this.cardNumber);
       }else{
         that.discout = json.cardBalance;
       }
@@ -74,7 +74,7 @@ class BonusCard {
     })
     .then(json => {
       if (json.statusCode === 0){
-        throw new NotFoundError(this.action, 'Не найден номер бонусной карты - ' + this.cardNumber);
+        throw new NotFoundError(this.action, 'Не вдалося знайти номер бонусної картки - ' + this.cardNumber);
       }else{
         that.accrualAmount = json.accrualAmount;
       }

@@ -59,7 +59,7 @@ class PaymentAct {
     })
     .then(json => {
       if (json.Act.length == 0){
-        throw new NotFoundError(this.action, 'Не найден номер акта - ' + this.actNumber);
+        throw new NotFoundError(this.action, 'Не вдалося знайти номер акта - ' + this.actNumber);
       }else{
         this._parseResult(json.Act);
       }
@@ -84,7 +84,7 @@ class PaymentAct {
           if (result.recordset.length > 0) {
             that._parseResult(result.recordset, true);
           } else {
-            throw new NotFoundError(this.action, 'Не найден номер акта - ' + that.actNumber);
+            throw new NotFoundError(this.action, 'Не вдалося знайти номер акта - ' + that.actNumber);
           }
           sql.close();
 
