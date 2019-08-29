@@ -27,7 +27,7 @@ class Database {
       .then(function () {
       }, function (err) {
         // console.log('Unable to connect to the database:', err);
-        throw new InternalServerError(this.action, 'Не удалось подключиться к базе данных: ' + err.message);
+        throw new InternalServerError(this.action, 'Failed to connect to database: ' + err.message);
       });
   }
 
@@ -78,7 +78,7 @@ class Database {
         return data.id;
       })
       .catch(err => {
-        throw new InternalServerError(this.action, 'Ошибка записи платежа: ' + err.message);
+        throw new InternalServerError(this.action, 'Error writing payment to database: ' + err.message);
       })
   }
 
@@ -87,11 +87,11 @@ class Database {
     let pm = await this.payment.findById(referense)
     if (pm !== null) {
       if (pm.payStatus) {
-        throw new InternalServerError(this.action, 'Платеж уже оплачен - ' + referense);
+        throw new InternalServerError(this.action, 'Payment already paid - ' + referense);
       }
       return pm;
     } else {
-      throw new InternalServerError(this.action, 'Код reference не найден - ' + referense);
+      throw new InternalServerError(this.action, 'Reference code not found - ' + referense);
     }
   }
 
@@ -99,11 +99,11 @@ class Database {
 
     if (pm !== undefined) {
       if (pm.payStatus) {
-        throw new InternalServerError(this.action, 'Платеж уже оплачен - ' + reference);
+        throw new InternalServerError(this.action, 'Payment already paid - ' + reference);
       }
       await pm.update({ payStatus: true })
     } else {
-      throw new InternalServerError(this.action, 'Отсутствует запись для обновления статуса оплаты');
+      throw new InternalServerError(this.action, 'Missing entry to update payment status - ' + reference);
     }
   }
 }

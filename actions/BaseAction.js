@@ -16,7 +16,7 @@ class BaseAction {
         this._getRequestValuesXML(result);
       }
     } catch (error) {
-      throw new InternalServerError(this.action, 'Не удалось получить значение праметра из запроса - ' + error.message);
+      throw new InternalServerError(this.action, 'Failed to get parameter value from request - ' + error.message);
     }
   }
 

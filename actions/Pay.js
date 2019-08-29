@@ -33,7 +33,7 @@ class Pay extends BaseAction{
     let pm = await db.findPayment(this.reference);
 
     if (pm.paySum !== this.totalSum){
-      throw new InternalServerError('Pay', 'Сумма оплаты из запроса не равна сумме подтвержденной оплаты');
+      throw new InternalServerError('Pay', 'The amount of payment from the request is not equal to the amount of confirmed payment');
     }
 
     let billDoc = new BillingDoc(pm.id, pm.actID, pm.bonusID, pm.actSum, pm.paySum, pm.accrualAmount, pm.divisionID, pm.clientName, 'Pay');

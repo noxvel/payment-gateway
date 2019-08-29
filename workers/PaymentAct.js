@@ -54,12 +54,12 @@ class PaymentAct {
       if (response.ok) {
         return response.json();
       } else {
-        throw new InternalServerError(this.action, 'Не удалось получить данные по номеру акта.');
+        throw new InternalServerError(this.action, 'Failed to get data for payment act number');
       }
     })
     .then(json => {
       if (json.Act.length == 0){
-        throw new NotFoundError(this.action, 'Не вдалося знайти номер замовлення - ' + this.actNumber);
+        throw new NotFoundError(this.action, 'Could not find payment act number - ' + this.actNumber);
       }else{
         this._parseResult(json.Act);
       }
@@ -84,7 +84,7 @@ class PaymentAct {
           if (result.recordset.length > 0) {
             that._parseResult(result.recordset, true);
           } else {
-            throw new NotFoundError(this.action, 'Не вдалося знайти номер замовлення - ' + that.actNumber);
+            throw new NotFoundError(this.action, 'Could not find payment act number - ' + that.actNumber);
           }
           sql.close();
 

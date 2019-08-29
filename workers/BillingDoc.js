@@ -34,7 +34,7 @@ class BillingDoc {
         if (response.ok) {
           return response.json();
         } else {
-          throw new InternalServerError(this.action, 'Ошибка при запросе к платежной системе');
+          throw new InternalServerError(this.action, 'Error requesting accounting system');
         }
       })
       .then(status => {

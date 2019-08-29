@@ -30,7 +30,7 @@ class ActionHandler {
     try {
       this.action = body.action;
     } catch (err) {
-      throw new BadRequestError('Не удалось получить имя действия');
+      throw new BadRequestError('Failed to get action name');
     }
     this.result = body;
   }
@@ -42,12 +42,12 @@ class ActionHandler {
       trim: true
     }, (err, result) => {
       if (err) {
-        throw new BadRequestError('Не удалось распарсить тело запроса');
+        throw new BadRequestError('Failed to parse request body');
       }
       try {
         this.action = result.Transfer.$.action;
       } catch (err) {
-        throw new BadRequestError('Не удалось получить имя действия');
+        throw new BadRequestError('Failed to get action name');
       }
       this.result = result;
     });
@@ -65,7 +65,7 @@ class ActionHandler {
         this.actionObj = new Pay();
         break;
       default:
-        throw new BadRequestError('Неизвестное название действия - ' + this.action);
+        throw new BadRequestError('Unknown action name - ' + this.action);
     }
   }
 
