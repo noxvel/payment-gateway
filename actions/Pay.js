@@ -32,7 +32,7 @@ class Pay extends BaseAction{
 
     let pm = await db.findPayment(this.reference);
 
-    if (pm.paySum !== this.totalSum){
+    if (pm.paySum != this.totalSum){
       throw new InternalServerError('Pay', 'The amount of payment from the request is not equal to the amount of confirmed payment');
     }
 
