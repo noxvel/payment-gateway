@@ -17,6 +17,7 @@ class PaymentAct {
     this.divisionId = '';
     this.clientName = '';
     this.actSum = 0;
+    this.actServiceArray = [];
   }
 
   async getPaymentData(){
@@ -37,7 +38,9 @@ class PaymentAct {
 
     if (isSql){
       result.forEach(i => {
-        this.actSum += i.SERVICE_FINAL_PRICE;
+        let finalSum = Math.round((i.SERVICE_QUANTITY * i.SERVICE_FINAL_PRICE) * 100) / 100;
+        this.actServiceArray.push({service: i.SERVICE_NAME, price: finalSum});
+        this.actSum += finalSum; 
       })
     }else{
       this.actSum     = result[0].K_OPLATE;

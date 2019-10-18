@@ -14,7 +14,7 @@ class Database {
     this.payment = null;
   }
 
-  connect() {
+  async connect() {
     this.connection = new Sequelize('payments', null, null, {
       dialect: 'sqlite',
       // SQLite only

@@ -11,6 +11,8 @@ class Check extends BaseAction{
     this.actNumber = '';
     this.bonusNumber = '';
     this.totalSum = 0;
+    this.payAct;
+    this.bonus;
   }
 
   _getRequestValuesJSON(result) {
@@ -27,26 +29,32 @@ class Check extends BaseAction{
 
   async resolveAction() {
 
-    let payAct = new PaymentAct('Check', this.actNumber);
-    await payAct.getPaymentData();
+    this.payAct = new PaymentAct('Check', this.actNumber);
+    await this.payAct.getPaymentData();
 
-    let bonus = new BonusCard('Check', this.bonusNumber, payAct.actSum);
+    this.bonus = new BonusCard('Check', this.bonusNumber, this.payAct.actSum);
     if (this.bonusNumber !== '') {
-      await bonus.getAccrualAmount(this.totalSum);
+      await this.bonus.getAccrualAmount(this.totalSum);
     }
 
     let db = new Database('Check');
     await db.connect();
     await db.definePayment();
-    this.reference = await db.addPayment(this.actNumber, this.bonusNumber, payAct.actSum, this.totalSum, bonus.accrualAmount, payAct.divisionId, payAct.clientName);
+    this.reference = await db.addPayment(this.actNumber, this.bonusNumber, this.payAct.actSum, this.totalSum, this.bonus.accrualAmount, this.payAct.divisionId, this.payAct.clientName);
 
   }
 
   _createResponseJSON() {
     let resBody = {
       action: "Check",
-      reference: this.reference
+      reference: this.reference,
+      actNumber: this.actNumber,
+      bonusNumber: this.bonusNumber,
+      clientName: this.payAct.clientName,
+      accrualAmount: this.bonus.accrualAmount,
+      actServiceArray: this.payAct.actServiceArray
     }
+
     return JSON.stringify(resBody);
   }
 
