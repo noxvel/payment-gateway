@@ -23,11 +23,11 @@ class Search extends BaseAction{
 
   async resolveAction() {
 
-    let payment = new PaymentAct('Search', this.actNumber);
+    let payment = new PaymentAct(this.action, this.actNumber);
     await payment.getPaymentData();
 
     if (this.bonusNumber !== '') {
-      let bonus = new BonusCard('Search', this.bonusNumber, payment.actSum);
+      let bonus = new BonusCard(this.action, this.bonusNumber, payment.actSum);
       // await bonus.getAllowedChargeBonusSum();
       await bonus.findCard();
     }
@@ -36,7 +36,7 @@ class Search extends BaseAction{
   }
 
   _createResponseJSON(){
-    let resBody = { action: "Search",
+    let resBody = { action: this.action,
                     actNumber: this.actNumber,
                     bonusNumber: this.bonusNumber,
                     actSum: this.actSum}
@@ -49,7 +49,7 @@ class Search extends BaseAction{
     let xml = builder.create('Transfer', { version: '1.0', encoding: 'UTF-8', standalone: true })
       .att('xmlns', 'http://debt.privatbank.ua/Transfer')
       .att('interface', 'Debt')
-      .att('action', 'Search')
+      .att('action', this.action)
       .ele('Data', { 'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance', 'xsi:type': 'DebtPack' })
       .ele('Message', {}, `Сумма по акту - ${this.actSum}.`)
       .up()
