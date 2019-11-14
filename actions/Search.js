@@ -2,6 +2,11 @@ const PaymentAct = require('../workers/PaymentAct.js');
 const BonusCard = require('../workers/BonusCard.js');
 const BaseAction = require('./BaseAction.js');
 
+const uppaidDevisions = ["114","115","223","224"];
+const {
+  NotFoundError
+} = require('../errors');
+
 class Search extends BaseAction{
 
   constructor() {
@@ -20,13 +25,18 @@ class Search extends BaseAction{
     this.actNumber = result.Transfer.Data[0].Unit[0].$.value;
     this.bonusNumber = result.Transfer.Data[0].Unit[1].$.value;
   }
-
+ 
   async resolveAction() {
 
     let payment = new PaymentAct(this.action, this.actNumber);
     await payment.getPaymentData();
 
-    if (this.bonusNumber !== '') {
+    //TODO Filter section for uppaid devisions
+    if(uppaidDevisions.includes(payment.divisionId))
+      throw new NotFoundError(this.action, "At the moment it is not possible to pay under this act - " + payment.actNumber)
+    //--------------------------------
+
+    if (this.bonusNumber !== "") {
       let bonus = new BonusCard(this.action, this.bonusNumber, payment.actSum);
       // await bonus.getAllowedChargeBonusSum();
       await bonus.findCard();
