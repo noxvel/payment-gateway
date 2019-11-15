@@ -48,6 +48,7 @@ class Check extends BaseAction{
     await db.definePayment();
     this.reference = await db.addPayment(this.actNumber, this.bonusNumber, this.payAct.actSum, this.totalSum, this.bonus.accrualAmount, this.payAct.divisionId, this.payAct.clientName);
 
+    await db.disconnect();
   }
 
   _createResponseJSON() {

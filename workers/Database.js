@@ -15,26 +15,30 @@ class Database {
   }
 
   async connect() {
-    this.connection = new Sequelize('payments', null, null, {
+    return this.connection = new Sequelize('payments', null, null, {
       dialect: 'sqlite',
       // SQLite only
       storage: SQLITE_FILE_PATH,
       operatorsAliases: false
     });
 
-    this.connection
-      .authenticate()
-      .then(function () {
-      }, function (err) {
-        // console.log('Unable to connect to the database:', err);
-        throw new InternalServerError(this.action, 'Failed to connect to database: ' + err.message);
-      });
+    // this.connection
+    //   .authenticate()
+    //   .then(function () {
+    //   }, function (err) {
+    //     // console.log('Unable to connect to the database:', err);
+    //     throw new InternalServerError(this.action, 'Failed to connect to database: ' + err.message);
+    //   });
+  }
+
+  async disconnect() {
+    return this.connection.close();
   }
 
   async definePayment() {
 
     //  MODEL
-    this.payment = this.connection.define('Payment', {
+    return this.payment = this.connection.define('payment', {
       actID: Sequelize.STRING(20),
       bonusID: Sequelize.STRING(20),
       actSum: Sequelize.FLOAT(15, 2),
@@ -61,7 +65,7 @@ class Database {
 
   }
 
-  addPayment(actID, bonusID, actSum, paySum, accrualAmount, divisionID, clientName) {
+  async addPayment(actID, bonusID, actSum, paySum, accrualAmount, divisionID, clientName) {
 
     return this.payment.create({
         actID: actID,
@@ -87,10 +91,12 @@ class Database {
     let pm = await this.payment.findById(referense)
     if (pm !== null) {
       if (pm.payStatus) {
+        await this.disconnect();
         throw new InternalServerError(this.action, 'Payment already paid - ' + referense);
       }
       return pm;
     } else {
+      await this.disconnect();
       throw new InternalServerError(this.action, 'Reference code not found - ' + referense);
     }
   }
@@ -99,10 +105,12 @@ class Database {
 
     if (pm !== undefined) {
       if (pm.payStatus) {
+        await this.disconnect();
         throw new InternalServerError(this.action, 'Payment already paid - ' + reference);
       }
       await pm.update({ payStatus: true })
     } else {
+      await this.disconnect();
       throw new InternalServerError(this.action, 'Missing entry to update payment status - ' + reference);
     }
   }

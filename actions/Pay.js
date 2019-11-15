@@ -33,6 +33,8 @@ class Pay extends BaseAction{
     await billDoc.create();
 
     await db.setPayStatus(pm, this.reference);
+
+    await db.disconnect();
   }
 
   _createResponseJSON() {
