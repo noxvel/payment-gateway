@@ -61,6 +61,7 @@ class Check extends BaseAction{
       clientName: this.payAct.clientName,
       accrualAmount: this.bonus.accrualAmount,
       divisionId: this.payAct.divisionId,
+      organizationID: this.payAct.organizationID,
       actServiceArray: this.payAct.actServiceArray
     }
 

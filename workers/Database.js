@@ -88,7 +88,7 @@ class Database {
 
   async findPayment(referense) {
 
-    let pm = await this.payment.findById(referense)
+    let pm = await this.payment.findByPk(referense)
     if (pm !== null) {
       if (pm.payStatus) {
         await this.disconnect();

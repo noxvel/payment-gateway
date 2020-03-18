@@ -10,11 +10,16 @@ const {
   NotFoundError
 } = require('../errors');
 
+const MP_Divisions = {id: 1, divs: []}; // All another diviosions are owned to MP
+const MS_Divisions = {id: 2, divs: ["114", "115"]};
+const MK_Divisions = {id: 3, divs: ["223", "224"]}
+
 class PaymentAct {
   constructor(action, actNumber) {
     this.action = action;
     this.actNumber = actNumber;
     this.divisionId = '';
+    this.organizationID = 0;
     this.clientName = '';
     this.actSum = 0;
     this.actServiceArray = [];
@@ -34,6 +39,16 @@ class PaymentAct {
     await this.getPaymentDataSQL();
   }
 
+  _resolveOrganizationID(divisionId) {
+    if (MS_Divisions.divs.includes(divisionId)){
+      this.organizationID = MS_Divisions.id;
+    } else if (MK_Divisions.divs.includes(divisionId)){
+      this.organizationID = MK_Divisions.id;
+    } else {
+      this.organizationID = MP_Divisions.id;
+    }
+  }
+
   _parseResult(result,isSql = false) {
 
     if (isSql){
@@ -48,6 +63,7 @@ class PaymentAct {
 
     this.clientName = result[0].PATIENT_NAME;
     this.divisionId = result[0].ID_PUNKTA_PRIEMA_ZAKAZA;
+    this._resolveOrganizationID(this.divisionId);
   }
 
   getPaymentDataAPI() {

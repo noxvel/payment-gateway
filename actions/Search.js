@@ -2,18 +2,18 @@ const PaymentAct = require('../workers/PaymentAct.js');
 const BonusCard = require('../workers/BonusCard.js');
 const BaseAction = require('./BaseAction.js');
 
-const uppaidDevisions = ["114","115","223","224"];
-const {
-  NotFoundError
-} = require('../errors');
+// const uppaidDevisions = ["114", "115", "223", "224"];
+// const {
+//   NotFoundError
+// } = require('../errors');
 
-class Search extends BaseAction{
-
+class Search extends BaseAction {
   constructor() {
     super("Search");
     this.actSum = 0;
     this.actNumber = '';
     this.bonusNumber = '';
+    this.payAct;
   }
 
   _getRequestValuesJSON(result) {
@@ -25,35 +25,36 @@ class Search extends BaseAction{
     this.actNumber = result.Transfer.Data[0].Unit[0].$.value;
     this.bonusNumber = result.Transfer.Data[0].Unit[1].$.value;
   }
- 
+
   async resolveAction() {
 
-    let payment = new PaymentAct(this.action, this.actNumber);
-    await payment.getPaymentData();
+    this.payAct = new PaymentAct(this.action, this.actNumber);
+    await this.payAct.getPaymentData();
 
-    //TODO Filter section for uppaid devisions
-    if(uppaidDevisions.includes(payment.divisionId))
-      throw new NotFoundError(this.action, "At the moment it is not possible to pay under this act - " + payment.actNumber)
+    // if (uppaidDevisions.includes(payment.divisionId))
+    //   throw new NotFoundError(this.action, "At the moment it is not possible to pay under this act - " + this.payAct.actNumber)
     //--------------------------------
 
     if (this.bonusNumber !== "") {
-      let bonus = new BonusCard(this.action, this.bonusNumber, payment.actSum);
+      let bonus = new BonusCard(this.action, this.bonusNumber, this.payAct.actSum);
       // await bonus.getAllowedChargeBonusSum();
       await bonus.findCard();
     }
-    this.actSum = payment.actSum;
 
   }
 
-  _createResponseJSON(){
-    let resBody = { action: this.action,
-                    actNumber: this.actNumber,
-                    bonusNumber: this.bonusNumber,
-                    actSum: this.actSum}
+  _createResponseJSON() {
+    let resBody = {
+      action: this.action,
+      actNumber: this.actNumber,
+      bonusNumber: this.bonusNumber,
+      actSum: this.payAct.actSum,
+      organizationID: this.payAct.organizationID
+    }
     return JSON.stringify(resBody);
   }
 
-  _createResponseXML(){
+  _createResponseXML() {
 
     let builder = require('xmlbuilder');
     let xml = builder.create('Transfer', { version: '1.0', encoding: 'UTF-8', standalone: true })
