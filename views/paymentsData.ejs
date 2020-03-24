@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en" class="h-100">
+  <head>
+    <!-- Bootstrap core CSS -->
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+      integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+      crossorigin="anonymous"
+    />
+  </head>
+  <body>
+    <main role="main">
+      <div class="container-fluid">
+        <table class="table table-hover table-sm" style="margin: 1rem 0">
+          <thead class="thead-dark">
+            <tr>
+              <th scope="col">ID</th>
+              <th scope="col">Org</th>
+              <th scope="col">act id</th>
+              <th scope="col">bonus id</th>
+              <th scope="col">created At</th>
+              <th scope="col">updated At</th>
+              <th scope="col">act sum</th>
+              <th scope="col">pay sum</th>
+              <th scope="col">accrualAmount</th>
+              <th scope="col">divisionID</th>
+              <th scope="col">clientName</th>
+              <th scope="col">payStatus</th>
+              <th scope="col">isCanceled</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% 
+            const orgClass = (org,payStatus) => {
+              if (org === 'MP' && payStatus){
+                return 'table-success'
+              }else if (org === 'MS' && payStatus){
+                return 'table-info'
+              }else{
+                return ''
+              }
+            }
+            data.rows.forEach(function(row) { 
+            let org = (row.divisionID == '114' || row.divisionID == '115') ? 'MS' : 'MP'; %>
+            <tr class="<%= orgClass(org,row.payStatus) %>">
+              <th scope="row"><%= row.id %></th>
+              <td><%= org %></td>
+              <td><%= row.actID %></td>
+              <td><%= row.bonusID %></td>
+              <td><%= row.createdAt.toLocaleString() %></td>
+              <td><%= row.updatedAt.toLocaleString() %></td>
+              <td><%= row.actSum %></td>
+              <td><%= row.paySum %></td>
+              <td><%= row.accrualAmount %></td>
+              <td><%= row.divisionID %></td>
+              <td><%= row.clientName %></td>
+              <td><%= row.payStatus %></td>
+              <td><%= row.isCanceled %></td>
+            </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+      <nav aria-label="Page navigation example">
+        <ul class="pagination justify-content-center">
+          <li class="<%= (page == 1) ? 'page-item disabled' : 'page-item'%>">
+            <a class="page-link" href="<%= `/paymentsDataToWatch?page=${page == 1 ? page : page - 1}` %>">Previous</a>
+          </li>
+          <% for(let i = 1; i < Math.ceil(data.count/limit) + 1; i++) { 
+            if ((i > page - 5) && (i < page + 5)){ %>
+              <li class="<%= (i == page) ? 'page-item active' : 'page-item'%>">
+                <a class="page-link" href="<%= `/paymentsDataToWatch?page=${i}` %>"><%= i %></a>
+              </li>
+            <% } }; %>
+          <li class="<%= (Math.ceil(data.count/limit) == page) ? 'page-item disabled' : 'page-item'%>">
+            <a class="page-link" href="<%= `/paymentsDataToWatch?page=${Math.ceil(data.count/limit) == page ? page : page + 1}` %>" >Next</a>
+          </li>
+        </ul>
+      </nav>
+    </main>
+  </body>
+</html>

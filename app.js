@@ -13,6 +13,9 @@ const app = express();
 
 app.use(logger.express);
 
+// set the view engine to ejs
+app.set('view engine', 'ejs');
+
 // create application/json parser
 const jsonParser = bodyParser.json();
 // parse an HTML body into a string
@@ -42,6 +45,20 @@ app.get('/', function (req, res) {
 	res.send('Connection is working fine');
 });
 
+// about page 
+app.get('/paymentsDataToWatch', asyncMiddleware(async (req, res, next) => {
+  let page = req.query.page || 1;
+  let limit = req.query.limit || 20;
+  let offset = (page - 1) * limit || 0;
+
+  const DataBase = require('./workers/Database.js');
+  const db = new DataBase('findAll');
+  await db.connect();   
+  await db.definePayment();
+  let data = await db.findAll(limit, offset);
+  await db.disconnect()
+  res.render('paymentsData', {data: data, limit: parseInt(limit), page: parseInt(page)});
+}));
 
 app.post('/privat', asyncMiddleware(async (req, res, next) => {
 

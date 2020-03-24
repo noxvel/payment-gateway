@@ -1,13 +1,8 @@
 const Sequelize = require('sequelize');
-const {
-  SQLITE_FILE_PATH
-} = require('../connection-config');
-const {
-  InternalServerError
-} = require('../errors');
+const { SQLITE_FILE_PATH } = require('../connection-config');
+const { InternalServerError } = require('../errors');
 
 class Database {
-
   constructor(action) {
     this.action = action;
     this.connection = null;
@@ -15,12 +10,12 @@ class Database {
   }
 
   async connect() {
-    return this.connection = new Sequelize('payments', null, null, {
+    return (this.connection = new Sequelize('payments', null, null, {
       dialect: 'sqlite',
       // SQLite only
       storage: SQLITE_FILE_PATH,
       operatorsAliases: false
-    });
+    }));
 
     // this.connection
     //   .authenticate()
@@ -36,9 +31,8 @@ class Database {
   }
 
   async definePayment() {
-
     //  MODEL
-    return this.payment = this.connection.define('payment', {
+    return (this.payment = this.connection.define('payment', {
       actID: Sequelize.STRING(20),
       bonusID: Sequelize.STRING(20),
       actSum: Sequelize.FLOAT(15, 2),
@@ -48,26 +42,24 @@ class Database {
       clientName: Sequelize.STRING(100),
       payStatus: Sequelize.BOOLEAN,
       isCanceled: Sequelize.BOOLEAN
-    });
+    }));
 
-
-     // SYNC(Create) SCHEMA
-     //await this.connection
-     //  .sync({
-     //    force: true 
-     //  })
-     //  .then(function () {
-     //    console.log('It worked!');
-     //  }, function (err) {
-     //    console.log('An error occurred while creating the table:', err);
-     //    throw err;
-     //  });
-
+    // SYNC(Create) SCHEMA
+    //await this.connection
+    //  .sync({
+    //    force: true
+    //  })
+    //  .then(function () {
+    //    console.log('It worked!');
+    //  }, function (err) {
+    //    console.log('An error occurred while creating the table:', err);
+    //    throw err;
+    //  });
   }
 
   async addPayment(actID, bonusID, actSum, paySum, accrualAmount, divisionID, clientName) {
-
-    return this.payment.create({
+    return this.payment
+      .create({
         actID: actID,
         bonusID: bonusID,
         actSum: actSum,
@@ -83,12 +75,11 @@ class Database {
       })
       .catch(err => {
         throw new InternalServerError(this.action, 'Error writing payment to database: ' + err.message);
-      })
+      });
   }
 
   async findPayment(referense) {
-
-    let pm = await this.payment.findByPk(referense)
+    let pm = await this.payment.findByPk(referense);
     if (pm !== null) {
       if (pm.payStatus) {
         await this.disconnect();
@@ -100,15 +91,23 @@ class Database {
       throw new InternalServerError(this.action, 'Reference code not found - ' + referense);
     }
   }
+  async findAll(limit, offset) {
+    let allpm = await this.payment.findAndCountAll({ order: [['id', 'DESC']], limit: limit, offset: offset });
+    if (allpm !== null) {
+      return allpm;
+    } else {
+      await this.disconnect();
+      throw new InternalServerError(this.action, 'Payments data not found');
+    }
+  }
 
   async setPayStatus(pm, reference) {
-
     if (pm !== undefined) {
       if (pm.payStatus) {
         await this.disconnect();
         throw new InternalServerError(this.action, 'Payment already paid - ' + reference);
       }
-      await pm.update({ payStatus: true })
+      await pm.update({ payStatus: true });
     } else {
       await this.disconnect();
       throw new InternalServerError(this.action, 'Missing entry to update payment status - ' + reference);
