@@ -40,7 +40,7 @@ class Check extends BaseAction{
 
     this.bonus = new BonusCard(this.action, this.bonusNumber, this.payAct.actSum);
     if (this.bonusNumber !== '') {
-      await this.bonus.getAccrualAmount(this.totalSum);
+      await this.bonus.getAccrualAmount(this.payAct.actSum, this.payAct.actServiceArray);
     }
 
     let db = new Database(this.action);
