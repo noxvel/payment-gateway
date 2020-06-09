@@ -43,7 +43,7 @@ class PaymentAct {
   _parseResult(result, isSql = false) {
     if (isSql) {
       result.forEach(i => {
-        let finalSum = Math.round(i.SERVICE_QUANTITY * i.SERVICE_FINAL_PRICE * 100) / 100
+        let finalSum = i.SERVICE_QUANTITY * i.SERVICE_FINAL_PRICE
         this.actServiceArray.push({
           service: i.SERVICE_NAME,
           price: finalSum,
@@ -58,6 +58,7 @@ class PaymentAct {
       this.actSum = result[0].K_OPLATE
     }
 
+    this.actSum = Math.round(this.actSum * 100) / 100
     this.clientName = result[0].PATIENT_NAME
     this.divisionId = result[0].ID_PUNKTA_PRIEMA_ZAKAZA
     this._resolveOrganizationID(this.divisionId)
