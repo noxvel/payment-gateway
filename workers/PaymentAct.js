@@ -81,7 +81,7 @@ class PaymentAct {
         }
       })
       .catch(err => {
-        throw err
+        throw new InternalServerError(this.action, 'Error receiving data from Doctor Eleks : ' + err.message)
       })
   }
 
@@ -120,7 +120,7 @@ class PaymentAct {
       })
       .catch(err => {
         sql.close()
-        throw err
+        throw new InternalServerError(this.action, 'Error receiving data from Doctor Eleks : ' + err.message)
       })
   }
 }
