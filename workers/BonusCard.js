@@ -23,7 +23,7 @@ class BonusCard {
       })
       .then(json => {
         if (json.statusCode === 0) {
-          throw new NotFoundError(this.action, 'Could not find bonus card number - ' + this.cardNumber)
+          throw new NotFoundError(this.action, 'Could not find bonus card number - ' + this.cardNumber, 22)
         }
       })
       .catch(err => {
@@ -43,7 +43,7 @@ class BonusCard {
       })
       .then(json => {
         if (json.statusCode === 0) {
-          throw new NotFoundError(this.action, 'Could not find bonus card number - ' + this.cardNumber)
+          throw new NotFoundError(this.action, 'Could not find bonus card number - ' + this.cardNumber, 22)
         } else {
           that.discout = json.cardBalance
         }
@@ -69,7 +69,7 @@ class BonusCard {
       })
       .then(json => {
         if (json.statusCode === 0) {
-          throw new NotFoundError(this.action, 'Could not find bonus card number - ' + this.cardNumber)
+          throw new NotFoundError(this.action, 'Could not find bonus card number - ' + this.cardNumber, 22)
         } else {
           that.accrualAmount = json.accrualAmount
         }

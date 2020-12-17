@@ -1,6 +1,6 @@
 const fetch = require('node-fetch')
 const { PAYMENT_ACT_SQL_CONFIG, PAYMENT_ACT_PROCEDURE_NAME, PAYMENT_ACT_API_PATH } = require('../connection-config')
-const { InternalServerError, NotFoundError } = require('../errors')
+const { InternalServerError, NotFoundError, BaseError } = require('../errors')
 
 const MP_Divisions = { id: 1, divs: [] } // All another diviosions are owned to MP
 const MS_Divisions = { id: 2, divs: ['114', '115'] }
@@ -44,6 +44,7 @@ class PaymentAct {
     if (isSql) {
       result.forEach(i => {
         let finalSum = i.SERVICE_QUANTITY * i.SERVICE_FINAL_PRICE
+        finalSum = Math.round(finalSum * 100) / 100
         this.actServiceArray.push({
           service: i.SERVICE_NAME,
           price: finalSum,
@@ -75,13 +76,17 @@ class PaymentAct {
       })
       .then(json => {
         if (json.Act.length == 0) {
-          throw new NotFoundError(this.action, 'Could not find payment act number - ' + this.actNumber)
+          throw new NotFoundError(this.action, 'Could not find payment act number - ' + this.actNumber, 21)
         } else {
           this._parseResult(json.Act)
         }
       })
       .catch(err => {
-        throw new InternalServerError(this.action, 'Error receiving data from Doctor Eleks : ' + err.message)
+        if(err instanceof BaseError){
+          throw err
+        }else{
+          throw new InternalServerError(this.action, 'Error receiving data from Doctor Eleks : ' + err.message)
+        }
       })
   }
 
@@ -108,7 +113,7 @@ class PaymentAct {
           that._parseResult(result.recordset, true)
         } else {
           sql.close()
-          throw new NotFoundError(this.action, 'Could not find payment act number - ' + that.actNumber)
+          throw new NotFoundError(this.action, 'Could not find payment act number - ' + that.actNumber, 21)
         }
         sql.close()
 
@@ -120,7 +125,11 @@ class PaymentAct {
       })
       .catch(err => {
         sql.close()
-        throw new InternalServerError(this.action, 'Error receiving data from Doctor Eleks : ' + err.message)
+        if(err instanceof BaseError){
+          throw err
+        }else{
+          throw new InternalServerError(this.action, 'Error receiving data from Doctor Eleks : ' + err.message)
+        }
       })
   }
 }

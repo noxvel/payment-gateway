@@ -8,11 +8,25 @@ const ERROR_TRANSLATE = {
         ru: 'Неизвестный тип запроса'
       }
     },
-    2: {
+    29: {
       name: {
         en: 'Information not found',
         ua: 'Інформація не знайдена',
         ru: 'Информация не найдена'
+      }
+    },
+    21: {
+      name: {
+        en: 'Information by act number not found',
+        ua: 'Інформацію за номером акту не знайдено',
+        ru: 'Информация по номеру акта не найдена'
+      }
+    },
+    22: {
+      name: {
+        en: 'Information by bonus card not found',
+        ua: 'Інформація за бонусною карткою не знайдена',
+        ru: 'Информация по бонусной карте не найдена'
       }
     },
     99: {
@@ -27,12 +41,13 @@ const ERROR_TRANSLATE = {
 
 class BaseError extends Error {
 
-  constructor(message, code, action = '') {
+  constructor(message, code, action = '', httpCode = 500) {
     super(message);
     Error.captureStackTrace(this, this.constructor);
     this.name = this.constructor.name;
     this.action = action;
     this.code = code;
+    this.httpCode = httpCode;
   }
 
   createResponse(reqType) {
@@ -73,19 +88,19 @@ class BaseError extends Error {
 module.exports.BaseError = BaseError;
 
 module.exports.BadRequestError = class extends BaseError {
-  constructor(msg = 'Unknown request type', action = '') {
-    super(msg, 1, action);
+  constructor(action = '', msg = 'Unknown request type', code = 1) {
+    super(msg, code, action, 400);
   }
 }
 
 module.exports.NotFoundError = class extends BaseError {
-  constructor(action = '', msg = 'Information not found') {
-    super(msg, 2, action);
+  constructor(action = '', msg = 'Information not found', code = 29) {
+    super(msg, code, action, 404);
   }
 }
 
 module.exports.InternalServerError = class extends BaseError {
-  constructor(action = '', msg = 'Internal server error') {
-    super(msg, 99, action);
+  constructor(action = '', msg = 'Internal server error', code = 99) {
+    super(msg, code, action, 500);
   }
 }

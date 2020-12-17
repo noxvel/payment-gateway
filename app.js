@@ -4,7 +4,8 @@ const bodyParser = require('body-parser');
 const ActionHandler = require('./workers/ActionHandler')
 const {
   BaseError,
-  BadRequestError
+  BadRequestError,
+  InternalServerError,
 } = require('./errors');
 
 const logger = require('./logger');
@@ -98,20 +99,15 @@ app.use(function (err, req, res, next) {
 
   if (err instanceof BaseError) {
     if (req.is('json')) {
-      res.type('json');
-      res.send(err.createResponse('json'));
+      res.type('json').status(err.httpCode).send(err.createResponse('json'));
     } else if (req.is('text/xml')) {
-      res.type('text/xml');
-      res.send(err.createResponse('xml'));
+      res.type('text/xml').status(err.httpCode).send(err.createResponse('xml'));
     } else {
-      res.status(500).json({
-        message: "Wrong Content-Type header in request, use JSON or XML type to see error message"
-      });
+      res.type('json').status(err.httpCode).send(err.createResponse('json'));
     }
   } else {
-    res.status(500).json({
-      message: err.message
-    });
+    const newErr = new InternalServerError("", err.message);
+    res.type('json').status(newErr.httpCode).send(newErr.createResponse('json'));
   }
 
   // res.status(500).json({
@@ -121,4 +117,4 @@ app.use(function (err, req, res, next) {
 
 })
 
-app.listen(4321, 'localhost');
+app.listen(4321, '0.0.0.0');
