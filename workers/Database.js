@@ -14,7 +14,7 @@ class Database {
       dialect: 'sqlite',
       // SQLite only
       storage: SQLITE_FILE_PATH,
-      operatorsAliases: false
+      operatorsAliases: '0' 
     }));
 
     // this.connection
