@@ -41,7 +41,7 @@ const asyncMiddleware = fn =>
       .catch(next);
   };
 
-app.get('/', function (req, res) {
+app.get('/', (req, res)  => {
   //res.sendStatus(400);
 	res.send('Connection is working fine');
 });
@@ -117,4 +117,4 @@ app.use(function (err, req, res, next) {
 
 })
 
-app.listen(4321, '0.0.0.0');
+app.listen(4321, 'localhost');

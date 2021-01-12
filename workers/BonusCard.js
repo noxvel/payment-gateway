@@ -1,7 +1,7 @@
 const fetch = require('node-fetch')
 const { BONUSCARD_API_PATH } = require('../connection-config')
 
-const { InternalServerError, NotFoundError } = require('../errors')
+const { InternalServerError, NotFoundError, BaseError } = require('../errors')
 
 class BonusCard {
   constructor(action, cardNumber, paySum) {
@@ -18,43 +18,49 @@ class BonusCard {
         if (response.ok) {
           return response.json()
         } else {
-          throw new InternalServerError()
+          throw new InternalServerError(this.action, `Error while requesting information on a bonus card, code - ${response.status}`)
         }
       })
       .then(json => {
         if (json.statusCode === 0) {
-          throw new NotFoundError(this.action, 'Could not find bonus card number - ' + this.cardNumber, 22)
+          throw new NotFoundError(this.action, `Could not find bonus card number - ${this.cardNumber}`, 22)
         }
       })
       .catch(err => {
-        throw err
+        if(err instanceof BaseError){
+          throw err
+        }else{
+          throw new InternalServerError(this.action, `Error receiving data by bonuscard: ${err.message}`)
+        }
       })
   }
 
   getAllowedChargeBonusSum() {
-    let that = this
     return fetch(BONUSCARD_API_PATH + 'balance/' + this.cardNumber + '?paysum=' + this.paySum)
       .then(response => {
         if (response.ok) {
           return response.json()
         } else {
-          throw new InternalServerError()
+          throw new InternalServerError(this.action, `Error while requesting information on a bonus card, code - ${response.status}`)
         }
       })
       .then(json => {
         if (json.statusCode === 0) {
-          throw new NotFoundError(this.action, 'Could not find bonus card number - ' + this.cardNumber, 22)
+          throw new NotFoundError(this.action, `Could not find bonus card number - ${this.cardNumber}`, 22)
         } else {
-          that.discout = json.cardBalance
+          this.discout = json.cardBalance
         }
       })
       .catch(err => {
-        throw err
+        if(err instanceof BaseError){
+          throw err
+        }else{
+          throw new InternalServerError(this.action, 'Error receiving data by bonuscard: ' + err.message)
+        }
       })
   }
 
   getAccrualAmount(totalSum, actServiceArray) {
-    let that = this
     return fetch(BONUSCARD_API_PATH + 'accrualamount/' + this.cardNumber + '/' + totalSum, {
       method: 'POST',
       body: JSON.stringify({ actServiceArray: actServiceArray }),
@@ -64,18 +70,22 @@ class BonusCard {
         if (response.ok) {
           return response.json()
         } else {
-          throw new InternalServerError()
+          throw new InternalServerError(this.action, `Error while requesting information on a bonus card, code - ${response.status}`)
         }
       })
       .then(json => {
         if (json.statusCode === 0) {
-          throw new NotFoundError(this.action, 'Could not find bonus card number - ' + this.cardNumber, 22)
+          throw new NotFoundError(this.action, `Could not find bonus card number - ${this.cardNumber}`, 22)
         } else {
-          that.accrualAmount = json.accrualAmount
+          this.accrualAmount = json.accrualAmount
         }
       })
       .catch(err => {
-        throw err
+        if(err instanceof BaseError){
+          throw err
+        }else{
+          throw new InternalServerError(this.action, `Error receiving data by bonuscard: ${err.message}`)
+        }
       })
   }
 }
