@@ -8,12 +8,13 @@ const {
 
 class ActionHandler {
 
-  constructor(reqType) {
+  constructor(reqType,typeOfClient) {
     this.reqType = reqType;
     this.action = '';
     this.resBody = '';
     this.result = {};
     this.reference = '';
+    this.typeOfClient = typeOfClient;
   }
 
   parseRequest(body) {
@@ -56,13 +57,13 @@ class ActionHandler {
   createAction() {
     switch (this.action) {
       case "Search":
-        this.actionObj = new Search();
+        this.actionObj = new Search(this.typeOfClient);
         break;
       case "Check":
-        this.actionObj = new Check();
+        this.actionObj = new Check(this.typeOfClient);
         break;
       case "Pay":
-        this.actionObj = new Pay();
+        this.actionObj = new Pay(this.typeOfClient);
         break;
       default:
         throw new BadRequestError(this.action, 'Unknown action name - ' + this.action);

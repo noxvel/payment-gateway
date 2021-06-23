@@ -5,22 +5,25 @@ const BaseAction = require('./BaseAction.js');
 const {
   InternalServerError
 } = require('../errors');
+const { TYPE_OF_CLIENT } = require('../constants.js');
 class Check extends BaseAction{
 
-  constructor() {
-    super("Check");
+  constructor(typeOfClient) {
+    super("Check",typeOfClient);
     this.reference = '';
     this.actNumber = '';
     this.bonusNumber = '';
     this.totalSum = 0;
     this.payAct;
     this.bonus;
+    this.terminalID = 0;
   }
 
   _getRequestValuesJSON(result) {
     this.actNumber = result.actNumber;
     this.bonusNumber = result.bonusNumber;
     this.totalSum = result.totalSum;
+    if(this.typeOfClient == TYPE_OF_CLIENT.selfpayment) this.terminalID = result.terminalID
   }
 
   _getRequestValuesXML(result) {
@@ -43,12 +46,30 @@ class Check extends BaseAction{
       await this.bonus.getAccrualAmount(this.payAct.actSum, this.payAct.actServiceArray);
     }
 
-    let db = new Database(this.action);
+    let db = new Database(this.action,this.typeOfClient);
     await db.connect();
     await db.definePayment();
-    this.reference = await db.addPayment(this.actNumber, this.bonusNumber, this.payAct.actSum, this.totalSum, this.bonus.accrualAmount, this.payAct.divisionId, this.payAct.clientName);
+
+    let newPayment = this._getNewPayment();
+    this.reference = await db.addPayment(newPayment);
 
     await db.disconnect();
+  }
+
+  _getNewPayment(){
+    let newPayment = {
+      actID: this.actNumber,
+      bonusID: this.bonusNumber,
+      actSum: this.payAct.actSum,
+      paySum: this.totalSum,
+      accrualAmount: this.bonus.accrualAmount,
+      divisionID: this.payAct.divisionId,
+      clientName: this.payAct.clientName,
+      payStatus: false,
+      isCanceled: false
+    }
+    if(this.typeOfClient == TYPE_OF_CLIENT.selfpayment) newPayment.terminalID = this.terminalID
+    return newPayment;
   }
 
   _createResponseJSON() {

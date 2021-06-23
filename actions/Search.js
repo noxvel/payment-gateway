@@ -8,8 +8,8 @@ const BaseAction = require('./BaseAction.js');
 // } = require('../errors');
 
 class Search extends BaseAction {
-  constructor() {
-    super("Search");
+  constructor(typeOfClient) {
+    super("Search",typeOfClient);
     this.actSum = 0;
     this.actNumber = '';
     this.bonusNumber = '';

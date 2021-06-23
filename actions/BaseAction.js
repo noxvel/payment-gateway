@@ -4,8 +4,9 @@ const {
 
 class BaseAction {
 
-  constructor(action) {
+  constructor(action, typeOfClient) {
     this.action = action;
+    this.typeOfClient = typeOfClient
   }
 
   getRequestValues(reqType, result) {

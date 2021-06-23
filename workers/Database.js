@@ -1,19 +1,22 @@
 const Sequelize = require('sequelize');
 const { SQLITE_FILE_PATH } = require('../connection-config');
 const { InternalServerError } = require('../errors');
+const { TYPE_OF_CLIENT } =  require('../constants')
+const { MODELS } =  require('../models')
 
 class Database {
-  constructor(action) {
+  constructor(action,typeOfClient) {
     this.action = action;
     this.connection = null;
     this.payment = null;
+    this.typeOfClient = typeOfClient
   }
 
   async connect() {
     return (this.connection = new Sequelize('payments', null, null, {
       dialect: 'sqlite',
       // SQLite only
-      storage: SQLITE_FILE_PATH,
+      storage: SQLITE_FILE_PATH[this.typeOfClient],
       operatorsAliases: '0' 
     }));
 
@@ -32,17 +35,9 @@ class Database {
 
   async definePayment() {
     //  MODEL
-    return (this.payment = this.connection.define('payment', {
-      actID: Sequelize.STRING(20),
-      bonusID: Sequelize.STRING(20),
-      actSum: Sequelize.FLOAT(15, 2),
-      paySum: Sequelize.FLOAT(15, 2),
-      accrualAmount: Sequelize.FLOAT(15, 2),
-      divisionID: Sequelize.INTEGER(3),
-      clientName: Sequelize.STRING(100),
-      payStatus: Sequelize.BOOLEAN,
-      isCanceled: Sequelize.BOOLEAN
-    }));
+    this.payment = this.connection.define('payment', MODELS[this.typeOfClient]);
+
+    return await this.payment.sync()
 
     // SYNC(Create) SCHEMA
     //await this.connection
@@ -57,19 +52,9 @@ class Database {
     //  });
   }
 
-  async addPayment(actID, bonusID, actSum, paySum, accrualAmount, divisionID, clientName) {
+  async addPayment(newPayment) {
     return this.payment
-      .create({
-        actID: actID,
-        bonusID: bonusID,
-        actSum: actSum,
-        paySum: paySum,
-        accrualAmount: accrualAmount,
-        divisionID: divisionID,
-        clientName: clientName,
-        payStatus: false,
-        isCanceled: false
-      })
+      .create(newPayment)
       .then(data => {
         return data.id;
       })

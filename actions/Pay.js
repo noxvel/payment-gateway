@@ -2,10 +2,11 @@ const BillingDoc = require('../workers/BillingDoc');
 const Database = require('../workers/Database');
 const BaseAction = require('./BaseAction.js');
 
+const { TYPE_OF_CLIENT } = require('../constants.js');
 class Pay extends BaseAction{
 
-  constructor() {
-    super("Pay");
+  constructor(typeOfClient) {
+    super("Pay",typeOfClient);
     this.reference = '';
     this.totalSum = 0;
   }
@@ -23,18 +24,36 @@ class Pay extends BaseAction{
 
   async resolveAction(){
 
-    let db = new Database(this.action);
+    let db = new Database(this.actioni, this.typeOfClient);
     await db.connect();
     await db.definePayment();
 
     let pm = await db.findPayment(this.reference);
 
-    let billDoc = new BillingDoc(pm.id, pm.actID, pm.bonusID, pm.actSum, pm.paySum, pm.accrualAmount, pm.divisionID, pm.clientName, this.action);
+    let dataForBillingDoc = this._getDataForBillingDoc(pm)
+    let billDoc = new BillingDoc(this.action, dataForBillingDoc);
     await billDoc.create();
 
     await db.setPayStatus(pm, this.reference);
 
     await db.disconnect();
+  }
+
+  _getDataForBillingDoc(payment){
+
+    let data = {
+      typeOfClient: this.typeOfClient,
+      reference: payment.id, 
+      actNumber: payment.actID,
+      bonusNumber: payment.bonusID,
+      paySum: payment.paySum,
+      actSum: payment.actSum,
+      accrualAmount: payment.accrualAmount,
+      divisionID: payment.divisionID,
+      clientName: payment.clientName
+    }
+    if(this.typeOfClient == TYPE_OF_CLIENT.selfpayment) data.terminalID = payment.terminalID
+    return data;
   }
 
   _createResponseJSON() {

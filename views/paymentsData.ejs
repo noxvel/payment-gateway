@@ -17,6 +17,9 @@
             <tr>
               <th scope="col">ID</th>
               <th scope="col">Org</th>
+              <% if (typeOfClient == "selfpayment") { %>
+                <th scope="col">terminal id</th>
+              <% } %>
               <th scope="col">act id</th>
               <th scope="col">bonus id</th>
               <th scope="col">created At</th>
@@ -46,6 +49,9 @@
             <tr class="<%= orgClass(org,row.payStatus) %>">
               <th scope="row"><%= row.id %></th>
               <td><%= org %></td>
+              <% if (typeOfClient == "selfpayment") { %>
+                <td><%= row.terminalID %></td>
+              <% } %>
               <td><%= row.actID %></td>
               <td><%= row.bonusID %></td>
               <td><%= row.createdAt.toLocaleString() %></td>
@@ -65,7 +71,7 @@
       <nav aria-label="Page navigation example">
         <ul class="pagination justify-content-center">
           <li class="<%= (page == 1) ? 'page-item disabled' : 'page-item'%>">
-            <a class="page-link" href="<%= `/paymentsDataToWatch?page=${page == 1 ? page : page - 1}` %>">Previous</a>
+            <a class="page-link" href="<%= `/${typeOfClient == "selfpayment" ? 'self' : ''}paymentsDataToWatch?page=${page == 1 ? page : page - 1}` %>">Previous</a>
           </li>
           <% for(let i = 1; i < Math.ceil(data.count/limit) + 1; i++) { 
             if ((i > page - 5) && (i < page + 5)){ %>
@@ -74,7 +80,7 @@
               </li>
             <% } }; %>
           <li class="<%= (Math.ceil(data.count/limit) == page) ? 'page-item disabled' : 'page-item'%>">
-            <a class="page-link" href="<%= `/paymentsDataToWatch?page=${Math.ceil(data.count/limit) == page ? page : page + 1}` %>" >Next</a>
+            <a class="page-link" href="<%= `/${typeOfClient == "selfpayment" ? 'self' : ''}paymentsDataToWatch?page=${Math.ceil(data.count/limit) == page ? page : page + 1}` %>" >Next</a>
           </li>
         </ul>
       </nav>

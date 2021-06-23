@@ -1,6 +1,7 @@
 const express = require('express');
-const bodyParser = require('body-parser');
+// const bodyParser = require('body-parser');
 
+const { TYPE_OF_CLIENT } =  require('./constants')
 const ActionHandler = require('./workers/ActionHandler')
 const {
   BaseError,
@@ -18,9 +19,9 @@ app.use(logger.express);
 app.set('view engine', 'ejs');
 
 // create application/json parser
-const jsonParser = bodyParser.json();
+const jsonParser = express.json();
 // parse an HTML body into a string
-const xmlParser = bodyParser.text({
+const xmlParser = express.text({
   type: ['text/html', 'text/xml']
 });
 
@@ -46,30 +47,41 @@ app.get('/', (req, res)  => {
 	res.send('Connection is working fine');
 });
 
-// about page 
-app.get('/paymentsDataToWatch', asyncMiddleware(async (req, res, next) => {
+const showPayments = async (typeOfClient, req, res, next) => {
+
   let page = req.query.page || 1;
   let limit = req.query.limit || 20;
   let offset = (page - 1) * limit || 0;
 
   const DataBase = require('./workers/Database.js');
-  const db = new DataBase('findAll');
+  const db = new DataBase('findAll',typeOfClient);
   await db.connect();   
   await db.definePayment();
   let data = await db.findAll(limit, offset);
   await db.disconnect()
-  res.render('paymentsData', {data: data, limit: parseInt(limit), page: parseInt(page)});
+  res.render('paymentsData', {data: data, limit: parseInt(limit), page: parseInt(page), typeOfClient: typeOfClient});
+  
+}
+
+// about page 
+app.get('/paymentsDataToWatch', asyncMiddleware(async (req, res, next) => {
+  showPayments(TYPE_OF_CLIENT.website, req, res, next)
 }));
 
-app.post('/privat', asyncMiddleware(async (req, res, next) => {
+// about page 
+app.get('/selfpaymentsDataToWatch', asyncMiddleware(async (req, res, next) => {
+  showPayments(TYPE_OF_CLIENT.selfpayment, req, res, next) 
+}));
+
+const handlePayment = async (typeOfClient, req, res, next) => {
 
   let handler;
 
   if (req.is('json')) {
-    handler = new ActionHandler('json');
+    handler = new ActionHandler('json',typeOfClient);
     res.type('json');
   } else if (req.is('text/xml')) {
-    handler = new ActionHandler('xml');
+    handler = new ActionHandler('xml',typeOfClient);
     res.type('text/xml');
   } else {
     throw new BadRequestError();
@@ -90,7 +102,15 @@ app.post('/privat', asyncMiddleware(async (req, res, next) => {
   handler.createResponse();
 
   res.send(handler.resBody);
+  
+}
 
+app.post('/privat', asyncMiddleware(async (req, res, next) => {
+  await handlePayment(TYPE_OF_CLIENT.website, req, res, next)
+}));
+
+app.post('/selfpayment', asyncMiddleware(async (req, res, next) => {
+  await handlePayment(TYPE_OF_CLIENT.selfpayment, req, res, next)
 }));
 
 app.use(function (err, req, res, next) {

@@ -48,6 +48,7 @@ class PaymentAct {
         this.actServiceArray.push({
           service: i.SERVICE_NAME,
           price: finalSum,
+          vat: Math.round(i.VAT * 100) / 100,
           discountPercentage: i.DISCOUNT_PERCENTAGE,
           discountSum: i.DISCOUNT_AMOUNT,
           quantity: i.SERVICE_QUANTITY,
