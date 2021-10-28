@@ -46,7 +46,7 @@ class PaymentAct {
         let finalSum = i.SERVICE_QUANTITY * i.SERVICE_FINAL_PRICE
         finalSum = Math.round(finalSum * 100) / 100
         this.actServiceArray.push({
-          service: i.SERVICE_NAME,
+          service: i.SERVICE_NAME, // NAZVANIYE_USLUGI_UKR - название на укр.
           price: finalSum,
           vat: Math.round(i.VAT * 100) / 100,
           discountPercentage: i.DISCOUNT_PERCENTAGE,

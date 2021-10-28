@@ -91,6 +91,7 @@ const handlePayment = async (typeOfClient, req, res, next) => {
     throw new BadRequestError();
   }
 
+
   handler.parseRequest(req.body);
 
   handler.createAction();
@@ -106,10 +107,12 @@ const handlePayment = async (typeOfClient, req, res, next) => {
 }
 
 app.post('/privat', asyncMiddleware(async (req, res, next) => {
+  logger.paymentRequests.info(JSON.stringify(req.body));
   await handlePayment(TYPE_OF_CLIENT.website, req, res, next)
 }));
 
 app.post('/selfpayment', asyncMiddleware(async (req, res, next) => {
+  logger.selfpaymentRequests.info(JSON.stringify(req.body));
   await handlePayment(TYPE_OF_CLIENT.selfpayment, req, res, next)
 }));
 
