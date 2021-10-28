@@ -1,6 +1,8 @@
 const express = require('express');
 // const bodyParser = require('body-parser');
 
+require('dotenv').config()
+
 const { TYPE_OF_CLIENT } =  require('./constants')
 const ActionHandler = require('./workers/ActionHandler')
 const {
@@ -140,4 +142,4 @@ app.use(function (err, req, res, next) {
 
 })
 
-app.listen(4321, 'localhost');
+app.listen(process.env.APP_PORT, process.env.APP_HOST);
