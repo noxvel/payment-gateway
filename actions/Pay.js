@@ -32,7 +32,8 @@ class Pay extends BaseAction{
 
     let dataForBillingDoc = this._getDataForBillingDoc(pm)
     let billDoc = new BillingDoc(this.action, dataForBillingDoc);
-    await billDoc.create();
+    billDoc.create();
+    // await billDoc.create();
 
     await db.setPayStatus(pm, this.reference);
 

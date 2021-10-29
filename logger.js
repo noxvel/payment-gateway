@@ -30,7 +30,7 @@ log4js.configure({
 module.exports = { 
   access: log4js.getLogger('access'),
   error: log4js.getLogger('error'),
-  paymentRequests: log4js.getLogger('paymentRequests'),
-  selfpaymentRequests: log4js.getLogger('selfpaymentRequests'),
+  website: log4js.getLogger('paymentRequests'),
+  selfpayment: log4js.getLogger('selfpaymentRequests'),
   express: log4js.connectLogger(log4js.getLogger('access'), {level: log4js.levels.INFO}),
 };
