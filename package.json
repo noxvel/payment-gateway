@@ -15,7 +15,7 @@
     "express": "^4.17.1",
     "log4js": "^6.3.0",
     "mssql": "^6.3.2",
-    "node-fetch": "^2.6.5",
+    "node-fetch": "^3.1.1",
     "sequelize": "^6.8.0",
     "sqlite3": "^5.0.2",
     "tedious": "^11.8.0",
