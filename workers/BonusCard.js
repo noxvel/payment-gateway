@@ -61,7 +61,7 @@ class BonusCard {
   }
 
   getAccrualAmount(totalSum, actServiceArray) {
-    return fetch(BONUSCARD_API_PATH + 'accrualamount/' + this.cardNumber + '/' + totalSum, {
+    return fetch(BONUSCARD_API_PATH + 'accrualamount/' + this.cardNumber + '?paysum=' + totalSum, {
       method: 'POST',
       body: JSON.stringify({ actServiceArray: actServiceArray }),
       headers: { 'Content-Type': 'application/json' }
