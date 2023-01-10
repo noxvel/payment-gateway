@@ -18,7 +18,7 @@
     "node-fetch": "^2.6.5",
     "sequelize": "^6.8.0",
     "sqlite3": "^5.0.2",
-    "tedious": "^11.8.0",
+    "tedious": "^15.1.2",
     "xml2js": "^0.4.23",
     "xmlbuilder": "^15.1.1"
   },
